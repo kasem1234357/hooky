@@ -1,0 +1,298 @@
+---
+title: useExport
+description: Custom React Hook for exporting data to excel and importing data from excel
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import React, { useState } from 'react';
+import ExportExample from '@/examples/ExportExample';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Export Data to Excel**: Easily export data to excel.
+- **Import Data from Excel**: Easily import data from excel.
+- **Customization**: Customize the behavior based on your requirements.
+- **Simple Integration**: Seamlessly integrate into any React functional component.
+
+---
+## Exported Functions and values
+The hook exports the following:
+
+- `generateExcelFile`
+- `importExcelFile`
+
+---
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+"use client";
+import useExport from "@/hooks/useExport";
+import { useState } from "react";
+
+const ExportExample = () => {
+    const {generateExcelFile,importExcelFile,importedExcelFile,reset} = useExport();
+    const limitFields =['name','age',"category"]
+    const [importedData,setImportedData] = useState({})
+    const data = [
+        {
+            id:0,
+            name:'john',
+            age:30,
+            gender:'male'
+
+        },
+        {
+            id:0,
+            name:"jane",
+            age:25,
+            gender:'female'
+        }
+    ]
+    const data2 =[
+        {
+            id:0,
+            title:"product 1",
+            price:100,
+            description:"this is product 1",
+            category:["apple","banana"],
+            photo:{
+                url:"test.com",
+                title:"test"
+            }
+        },
+        {
+            id:2,
+            title:"product 2",
+            price:200,
+            description:"this is product 2",
+            category:["apple","banana"],
+            photo:{
+                url:"test.com",
+                title:"test"
+            }
+        }
+    ]
+    return (
+        <div>
+            <h2>useExport Hook Example</h2>
+            <p>Export Data </p>
+            <div className="flex gap-2 flex-wrap pb-4">
+            <button className="p-2 px-4 bg-blue-700 rounded-lg "  onClick={()=>{
+                generateExcelFile(data,"exportData-demo")
+            }}>
+                Export data to Excel
+                </button>
+                <button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+                generateExcelFile(data2,"exportData2-demo")
+            }}>
+                Export data2 
+                </button>
+                <button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+                generateExcelFile(data,"exportData3-demo",{limitFields})
+            }}>export Data with limit fields </button>
+             <button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+                generateExcelFile(data2,"exportData4-demo",{limitFields})
+            }}>export Data2 with limit fields </button>
+            </div>
+            <div className="flex gap-2 relative pt-5 border-t-4 border-t-gray-800">
+            <input className="absolute top-0 left-0 w-0 h-0" name="excelFile" id="excelFile" type="file" accept=".xlsx" onChange={(e)=>{
+              importExcelFile(e)
+             }} placeholder="Upload Excel File"/>
+             <label htmlFor="excelFile" className="p-2 px-4 bg-green-700 rounded-lg ">
+                Upload
+             </label>
+                <button className="p-2 px-4 bg-gray-700 rounded-lg " onClick={()=>{
+               reset()
+            }}>
+                Reset
+                </button>
+            </div>
+             <div className="text-wrap bg-neutral-800 my-2 p-2">
+              {JSON.stringify(importedExcelFile)}
+             </div>
+                </div>
+                );
+                };
+
+
+                export default ExportExample;
+  ```
+  </Tab>
+  <Tab value="view">
+    <ExportExample />
+  </Tab>
+</Tabs>
+
+---
+
+## useExport
+
+### generateExcelFile   
+
+Generates an excel file from the provided data.
+
+#### Parameters
+| Parameter | Type | Description |
+| --- | --- | --- |
+| data | any[] | The data to be exported. |
+| fileName | string | The name of the file to be generated. |
+| options | object | An object containing the options for the export. |
+| options.limitFields | string[] | An array of field names to be removed. If not provided, all fields will be exported. |
+{/* | options.sheetName | string | The name of the sheet to be generated. Default is "Sheet1". |
+| options.sheetName | string | The name of the sheet to be generated. Default is "Sheet1". | */}
+
+```tsx
+const {generateExcelFile} = useExport();
+
+generateExcelFile(data: any[], fileName: string, options?: {
+    limitFields?: string[],
+    // sheetName?: string,
+    // sheetName?: string
+});
+```
+
+### importExcelFile
+Imports data from an excel file.
+
+#### Parameters
+| Parameter | Type | Description |
+| --- | --- | --- |
+| file | File | The file to be imported. |
+| callback | (data: any) => void | A callback function that is called after the data is imported. |
+
+```tsx
+const {importExcelFile} = useExport();
+
+importExcelFile(file: File, callback?: (data: any) => void);
+```
+
+---
+
+## TypeScript
+
+The hook exports the following type definitions:
+
+- `importExcelFile`
+- `generateExcelFile`
+- `reset`
+- `importedExcelFile`
+
+
+---
+## Hook Full code
+```tsx
+import { useState } from "react";
+import {utils,writeFile, readFile,} from "xlsx";
+const useExport =()=>{
+  const unvalidKey =[]
+  const [importedData,setImportedData]=useState({})
+  
+  const convertArrayToString = (key,item,data,i)=>{
+     if(item.hasOwnProperty('length')){
+       if(i === 0){
+         const state = item.every(el => typeof(el) !=='object')
+         if(!state) {
+           unvalidKey.push(key)
+           return item
+         }
+         else{
+           return item.join(', ')
+       }
+       }else if(unvalidKey.indexOf(key) === -1){
+         return item.join(', ')
+       }
+      
+     }else{
+       for(let dataItem of Object.keys(item)){
+         data[key+' => '+dataItem] = item[dataItem]
+       }
+       delete data[key]
+     }
+  }
+  const  generateExcelFile=(data,fileName,option={})=>{
+    for(let i=0;i<data.length;i++){
+      if(option?.limitFields){
+        for(let item of option.limitFields){
+          delete data[i][item]
+        }
+      } 
+        for(let dataItem of Object.keys(data[i])){
+            if(typeof data[i][dataItem] === 'object'){
+
+              data[i][dataItem] = convertArrayToString(dataItem,data[i][dataItem],data[i],i)
+            }
+            if(data[i][dataItem] === undefined){
+              delete data[i][dataItem]
+            }
+        }
+        
+
+    }
+  
+    const worksheet = utils.json_to_sheet(data);
+    console.log(worksheet)
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    writeFile(workbook, `${fileName}.xlsx`);
+  }
+  const importExcelFile =(e,callback?:(data:any)=>void)=>{
+    e.preventDefault();
+    if (e.target.files) {
+      let jsonFile ={}
+      const name = e.target.files[0].name;
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(e.target.files[0]);
+        reader.onload = (e) => {
+            const data = e.target.result;
+            const workbook = readFile(data, { type: "array" });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const json = utils.sheet_to_json(worksheet);
+            let refactoringData:{[key:string]:any} =[];
+            const fieldsToRefactor:string[] = []
+
+            for(let originalKey of Object.keys(json[0])){
+              if(originalKey.indexOf(' => ') !== -1){
+                fieldsToRefactor.push(originalKey)
+              }
+            }
+            refactoringData = json.map((item:any)=>{
+                    for(let field of fieldsToRefactor){
+                      const key = field.split(' => ')[0]
+                      const dataItem = field.split(' => ')[1]
+                      item[key] = {
+                        ...item[key],
+                        [dataItem]:item[field]
+                      }
+                      delete item[field]
+                    }
+                    return item
+
+
+            })
+            
+            setImportedData({data:refactoringData,fileName:name})
+            callback && callback(refactoringData)
+            
+            
+           
+        };
+         
+    }
+    
+  }
+  const reset = ()=>{
+    setImportedData({})
+  }
+      return{
+        generateExcelFile,
+        importExcelFile,
+        importedExcelFile:importedData,
+        reset
+      }
+}
+export default useExport
+```

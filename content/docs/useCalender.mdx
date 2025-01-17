@@ -1,0 +1,641 @@
+---
+title: useCalender
+description: The `useCalender` hook is a utility function that provides calendar-related information and methods, including details about the current date, month, and year, as well as helper functions for retrieving day/month names and calculating the number of days in a specific month.
+---
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import CalenderExample from '@/examples/CalenderExample';
+
+## Features
+- **Date Manipulation**: Easily manipulate dates and perform date calculations.
+- **Internationalization**: Support for multiple languages and formats.
+- **Customization**: Customize the output based on your requirements.
+- **Simple Integration**: Seamlessly integrate into any React functional component.
+- **TypeScript Support**: Written in TypeScript, offering strong typing and better developer experience.
+- **Easily Configurable**: Adjust the hook's behavior to suit your needs.
+
+---
+## Exported Functions and values
+The hook exports the following:
+
+- `numberDaysInMonth`
+- `numberDaysInPreviosMonth`
+- `dayOfTheMonth`
+- `getDayName`
+- `getMonthName`
+- `fullDate`
+- `months`
+- `days`
+- `Names`
+- `currentYear`
+- `currentMonth`
+- `currentDay`
+- `globalInfo`
+- `stepBackward`
+- `stepForward`
+
+---
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+"use client";
+import React from "react";
+import useCalender from "@/hooks/useCalender";
+
+const CalendarExample = () => {
+    
+  const {
+    numberDaysInMonth,
+    dayOfTheMonth,
+    getDayName,
+    getMonthName,
+    fullDate,
+    months,
+    days,
+    Names,
+    currentYear,
+    currentMonth,
+    currentDay,
+    numberDaysInPreviosMonth,
+    globalInfo,
+    stepBackward,
+    stepForward,
+  } = useCalender();
+
+  const info = globalInfo();
+  const [date, setDate] = React.useState({
+        year: info.currentYear,
+        month: info.monthIndex,
+        day: info.currentDay.index
+  })
+  // Example of stepping forward and backward
+  const nextDay = stepForward(info.currentDay.index, info.monthIndex, info.currentYear);
+  const previousDay = stepBackward(info.currentDay.index, info.monthIndex, info.currentYear);
+
+  return (
+    <div>
+      <h2>useCalender Hook Example</h2>
+      <h3>Basic Information</h3>
+      <p>Full Date: {fullDate}</p>
+      <div className="flex flex-row gap-2">
+      <p className="p-2 bg-slate-800 rounded-md">Current Year: {currentYear}</p>
+      <p className="p-2 bg-slate-800 rounded-md">Current Month: {currentMonth.name}</p>
+      <p className="p-2 bg-slate-800 rounded-md">Current Day: {currentDay.name}</p>
+      </div>
+     
+
+      <h2>Month and Day Names</h2>
+      <p>Get Month Name (Short): {getMonthName(info.monthIndex, "En", "short")}</p>
+      <p>Get Month Name (Long): {getMonthName(info.monthIndex, "En", "long")}</p>
+      <p>Get Day Name (Short): {getDayName(info.dayIndexOfTheWeek, "En", "short")}</p>
+      <p>Get Day Name (Long): {getDayName(info.dayIndexOfTheWeek, "En", "long")}</p>
+
+      <h2>Number of Days</h2>
+      <p>Days in Current Month: {numberDaysInMonth(info.currentYear, info.monthIndex)}</p>
+      <p>Days in Previous Month: {numberDaysInPreviosMonth(info.currentYear, info.monthIndex)}</p>
+      <p>First Day of the month: {dayOfTheMonth(info.currentYear, info.monthIndex).name}</p>
+
+      <h2>Global Information</h2>
+      <p>Start Day of the Month: {info.startDayOfTheMonth.name}</p>
+      <p>Days in Current Month: {info.daysOfTheMonth}</p>
+
+      <h2>Step Navigation</h2>
+      
+      <p>date: {date.year} {Names.short.En.months[date.month]} {date.day}</p>
+      <div className="flex gap-2">
+      <button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+        const dateBack = stepBackward(date.day, date.month, date.year);
+        setDate({
+            year: dateBack.year,
+            month: dateBack.monthIndex,
+            day: dateBack.dayIndex
+
+        })
+      }}>back</button><button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+        const dateNext = stepForward(date.day, date.month, date.year);
+        setDate({
+            year: dateNext.year,
+            month: dateNext.monthIndex,
+            day: dateNext.dayIndex
+
+        })
+      }}>next</button>
+      </div>
+      
+    </div>
+  );
+};
+
+export default CalendarExample;
+
+  ```
+  </Tab>
+  <Tab value="view">
+  <CalenderExample/>
+  </Tab>
+  </Tabs>
+### numberDaysInMonth
+Returns the number of days in a specified month of a given year.
+```tsx 
+function numberDaysInMonth(year: number, month: number): number;
+```
+<TypeTable
+  type={{
+    year: {
+      type: 'number',
+      default:'new Date().getFullYear()',
+    },
+    month:{
+      type:'number',
+      default:'new Date().getMonth()',   
+    }
+  }}
+/>
+### numberDaysInPreviosMonth
+Returns the number of days in the previous month of a given year and month.
+```tsx
+function numberDaysInPreviosMonth(year: number, month: number): number;
+```
+<TypeTable
+  type={{
+      year: {
+        type: 'number',
+          default:'new Date().getFullYear()',
+      },
+      month:{
+        type:'number',
+        default:'new Date().getMonth()',   
+      }
+  }}
+/>
+
+### dayOfTheMonth
+Returns the day of the month for a given year and month. (first day of the month) 
+```tsx
+function dayOfTheMonth(year: number, month: number): formatType;
+```
+```tsx
+type formatType = {
+  index: number;
+  name: string;
+};
+```
+<Tabs items={['props', 'return data']}>
+  <Tab value="props">
+<TypeTable
+
+  type={{
+    year: {
+      type: 'number',
+      default:'new Date().getFullYear()',
+    },
+    month:{
+      type:'number',
+      default:'new Date().getMonth()',   
+    }
+  }}
+/>
+</Tab>
+
+<Tab value="return data">
+<TypeTable
+     type={{
+        index:{
+            type:'number',
+            description:'the index of the day of the month',
+            default:'dayOfTheMonth.index',
+        },
+        name:{
+            type:'string',
+            description:'the name of the day of the month',
+            default:'dayOfTheMonth.name',
+        }
+     }}
+     />
+</Tab>
+</Tabs>
+
+### getDayName
+Returns the name of a day based on its index.
+```tsx
+function getDayName(index: number, lang: string = "En", type: "short" | "long" = "long"): string;
+```
+Parameters:
+<TypeTable
+  type={{
+    index: {
+      type: 'number',
+      description: 'The index of the day.',
+    },
+    lang: {
+      type: 'string',
+      description: 'The language code.',
+      default: '"En"',
+    },
+    type: {
+      type: '"short" | "long"',
+      description: 'The format type.',
+      default: '"long"',
+    },
+  }}
+/>
+### getMonthName
+Returns the name of a month based on its index.
+```tsx
+function getMonthName(index: number, lang?: string, type?: "short" | "long"): string;
+
+```
+Parameters:
+<TypeTable
+  type={{
+    index: {
+      type: 'number',
+      description: 'The index of the month 1 ==> 11.',
+
+    },
+    lang: {
+      type: 'string',
+      description: 'The language code.',
+      default: '"En"',
+    },
+    type: {
+      type: '"short" | "long"',
+      description: 'The format type.',
+      default: '"long"',
+    },
+  }}
+/>
+### fullDate
+Returns the full date in the format of `YYYY-MM-DD`.
+
+### months
+An array of month names in the format of `January`, `February`, `March`, etc.
+
+### days
+An array of day names in the format of `Sunday`, `Monday`, `Tuesday`, etc.
+
+### Names
+Object containing the names of months and days in different languages.
+```tsx
+const Names: names
+```
+ 
+ ```tsx
+ type names = {
+  short:{
+    [key: string]:{days:string[]; months:string[]} 
+  }
+  long:{
+    [key: string]:{days:string[]; months:string[]} 
+  }
+}
+```
+### currentYear
+The current year.
+### currentMonth
+return the current month name and index.
+<TypeTable
+  type={{
+    index:{
+      type:'number',
+      description:'the index of the month',
+      default:'currentMonth.index',
+    },
+    name:{
+      type:'string',
+      description:'the name of the month',
+      default:'currentMonth.name',
+    }
+  }}
+/>
+
+### currentDay
+return the current day name and index.
+<TypeTable
+  type={{
+    index:{
+      type:'number',
+      description:'the index of the day',
+      default:'currentDay.index',
+    },
+    name:{
+      type:'string',
+      description:'the name of the day',
+      default:'currentDay.name',
+    },
+    dayIndexOfTheWeek:{
+      type:'number',
+      description:'the index of the day in the week',
+      default:'currentDay.dayIndexOfTheWeek',
+    }    
+  }}
+/>
+
+### globalInfo
+return globalInfo object with all the information about the current date.
+<TypeTable
+  type={{
+    currentDay:{
+      type:'object',
+      description:'the current day object',
+      default:'globalInfo.currentDay',
+    },
+    currentMonth:{
+      type:'object',
+      description:'the current month object',
+      default:'globalInfo.currentMonth',
+    },
+    currentYear:{
+      type:'number',
+      description:'the current year',
+      default:'globalInfo.currentYear',
+    },
+    dayIndex:{
+      type:'number',
+      description:'the current day index',
+      default:'globalInfo.dayIndex',
+    },
+    monthIndex:{
+      type:'number',
+      description:'the current month index',
+      default:'globalInfo.monthIndex',
+    },
+    dayIndexOfTheWeek:{
+      type:'number',
+      description:'the current day index of the week',
+      default:'globalInfo.dayIndexOfTheWeek',
+    },
+    startDayOfTheMonth:{
+      type:'object',
+      description:'the start day of the month object',
+      default:'globalInfo.startDayOfTheMonth',
+    },
+    daysOfTheMonth:{
+      type:'number',
+      description:'the number of days in the month',
+      default:'globalInfo.daysOfTheMonth',
+    }
+  }}
+/>
+
+### stepBackward
+Returns the dayIndex and monthIndex of the previous month and year.
+```tsx
+
+stepBackward: (dayIndex: number, monthIndex: number, year: number) => {
+    dayIndex: number;
+    monthIndex: number;
+    year: number;
+}
+```
+
+### stepForward
+Returns the dayIndex and monthIndex of the next month and year.
+```tsx
+stepForward: (dayIndex: number, monthIndex: number, year: number) => {
+    dayIndex: number;
+    monthIndex: number;
+    year: number;
+    }
+    ```
+---
+## Hook Full code
+```tsx
+type formatType = {
+  index: number;
+  name: string;
+};
+type globalInfo = {
+  currentDay: { index: number; name: string; dayIndexOfTheWeek: number };
+  currentMonth: formatType;
+  currentYear: number;
+  dayIndex: number;
+  monthIndex: number;
+  dayIndexOfTheWeek: number;
+  startDayOfTheMonth: formatType;
+  daysOfTheMonth: number;
+};
+type names = {
+  short:{
+    [key: string]:{days:string[]; months:string[]} 
+  }
+  long:{
+    [key: string]:{days:string[]; months:string[]} 
+  }
+}
+const Names: names = {
+  short: {
+    En: {
+      days: ["San", "Mon", "Tus", "Wed", "Thu", "Fri", "Sat"],
+      months: [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ],
+    },
+    
+  },
+  long: {
+    En: {
+      months: [
+        "January ",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September ",
+        "October",
+        "November",
+        "December",
+      ],
+      days: [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ],
+    },
+    
+  },
+};
+const months: string[] = [
+  "January ",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September ",
+  "October",
+  "November",
+  "December",
+];
+const days: string[] = ["San", "Mon", "Tus", "Wed", "Thu", "Fri", "Sat"];
+
+const useCalender = () => {
+  const data = {
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+    day: new Date().getDate(),
+    dayIndexOfTheWeek: new Date().getDay(),
+  };
+  const nameFormat = (
+    index: number,
+    name: "months" | "days",
+    lang: string = "En",
+    type: "short" | "long" = "long"
+  ): string => {
+    return Names[type as keyof typeof Names ][lang as keyof typeof  String][name][index as  number];
+  };
+  function getMonthName(
+    index: number,
+    lang: string = "En",
+    type: "short" | "long" = "long"
+  ): string {
+    return nameFormat(index, "months", lang, type);
+  }
+  function getDayName(
+    index: number,
+    lang: string = "En",
+    type: "short" | "long" = "long"
+  ): string {
+    return nameFormat(index, "days", lang, type);
+  }
+  function numberDaysInMonth(year: number, month: number): number {
+    let numberDaysInMonth = new Date(year, month + 1, 0).getDate();
+    console.log(numberDaysInMonth);
+    return numberDaysInMonth;
+  }
+  function numberDaysInPreviosMonth(year: number, month: number): number {
+    if (month == 0) {
+      return numberDaysInMonth(year - 1, 11);
+    }
+    return numberDaysInMonth(year, month - 1);
+  }
+  function dayOfTheMonth(year: number, month: number): formatType {
+    let dayOfTheMonth = new Date(year, month).getDay();
+    console.log(dayOfTheMonth);
+    return {
+      index: dayOfTheMonth,
+      name: days[dayOfTheMonth],
+    };
+  }
+   const fullDate:string = `${data.year}-${data.month +1}-${data.day}`
+
+  const globalInfo = (lang = "En", type = "short"): globalInfo => {
+    const currentDay = {
+      index: data.day,
+      name: Names[type as keyof typeof Names][lang as keyof typeof  String]["days"][data.dayIndexOfTheWeek],
+      dayIndexOfTheWeek: data.dayIndexOfTheWeek,
+    };
+
+    return {
+      currentDay,
+      currentMonth: {
+        index: data.month,
+        name: Names[type as keyof typeof Names][lang as keyof typeof  String]["months"][data.month],
+      },
+      currentYear: data.year,
+      dayIndex: data.day,
+      monthIndex: data.month,
+      dayIndexOfTheWeek: data.dayIndexOfTheWeek,
+      startDayOfTheMonth: dayOfTheMonth(data.year, data.month),
+      daysOfTheMonth: numberDaysInMonth(data.year, data.month),
+    };
+  };
+ const stepBackward = (dayIndex:number,monthIndex:number,year:number)=>{
+  if(dayIndex === 1 && monthIndex !== 0){
+    const getMonthsDaysInPreviousMonth = numberDaysInPreviosMonth(year,monthIndex)
+    return {
+      dayIndex: getMonthsDaysInPreviousMonth,
+      monthIndex: monthIndex - 1,
+      year: year
+    }
+
+ } else if(dayIndex === 1 && monthIndex === 0){
+  const getMonthsDaysInPreviousMonth = numberDaysInPreviosMonth(year-1,monthIndex)
+   return {
+     dayIndex: getMonthsDaysInPreviousMonth,
+     monthIndex: 11,
+     year: year - 1
+ }
+}
+return {
+  dayIndex: dayIndex - 1,
+  monthIndex: monthIndex,
+  year: year
+ }
+}
+ const stepForward = (dayIndex:number,monthIndex:number,year:number)=>{
+  if(dayIndex === numberDaysInMonth(year,monthIndex)){
+    if(monthIndex === 11){
+   
+    return {
+      dayIndex: 1,
+      monthIndex: 0,
+      year: year+1
+    }
+  } else {
+  
+    return {
+      dayIndex: 1,
+      monthIndex: monthIndex + 1,
+      year: year
+    }
+  }
+  }
+   else {
+    return {
+      dayIndex: dayIndex + 1,
+      monthIndex: monthIndex,
+      year: year
+    }
+  }
+}
+
+  return {
+    numberDaysInMonth,
+    dayOfTheMonth,
+    getDayName,
+    getMonthName,
+    fullDate,
+    months,
+    days,
+    Names,
+    currentYear: data.year,
+    currentMonth: {
+      index: data.month,
+      name: months[data.month],
+    },
+    currentDay: {
+      index: data.day,
+      name: days[data.dayIndexOfTheWeek],
+      dayIndexOfTheWeek: data.dayIndexOfTheWeek,
+    },
+    numberDaysInPreviosMonth,
+    globalInfo,
+    stepBackward,
+    stepForward,
+  };
+};
+export default useCalender;
+  ```

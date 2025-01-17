@@ -1,0 +1,111 @@
+import { useState } from "react";
+import {utils,writeFile, readFile,} from "xlsx";
+const useExport =()=>{
+  const unvalidKey =[]
+  const [importedData,setImportedData]=useState({})
+  
+  const convertArrayToString = (key,item,data,i)=>{
+     if(item.hasOwnProperty('length')){
+       if(i === 0){
+         const state = item.every(el => typeof(el) !=='object')
+         if(!state) {
+           unvalidKey.push(key)
+           return item
+         }
+         else{
+           return item.join(', ')
+       }
+       }else if(unvalidKey.indexOf(key) === -1){
+         return item.join(', ')
+       }
+      
+     }else{
+       for(let dataItem of Object.keys(item)){
+         data[key+' => '+dataItem] = item[dataItem]
+       }
+       delete data[key]
+     }
+  }
+  const  generateExcelFile=(data,fileName,option={})=>{
+    for(let i=0;i<data.length;i++){
+      if(option?.limitFields){
+        for(let item of option.limitFields){
+          delete data[i][item]
+        }
+      } 
+        for(let dataItem of Object.keys(data[i])){
+            if(typeof data[i][dataItem] === 'object'){
+
+              data[i][dataItem] = convertArrayToString(dataItem,data[i][dataItem],data[i],i)
+            }
+            if(data[i][dataItem] === undefined){
+              delete data[i][dataItem]
+            }
+        }
+        
+
+    }
+  
+    const worksheet = utils.json_to_sheet(data);
+    console.log(worksheet)
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    writeFile(workbook, `${fileName}.xlsx`);
+  }
+  const importExcelFile =(e,callback?:(data:any)=>void)=>{
+    e.preventDefault();
+    if (e.target.files) {
+      let jsonFile ={}
+      const name = e.target.files[0].name;
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(e.target.files[0]);
+        reader.onload = (e) => {
+            const data = e.target.result;
+            const workbook = readFile(data, { type: "array" });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const json = utils.sheet_to_json(worksheet);
+            let refactoringData:{[key:string]:any} =[];
+            const fieldsToRefactor:string[] = []
+
+            for(let originalKey of Object.keys(json[0])){
+              if(originalKey.indexOf(' => ') !== -1){
+                fieldsToRefactor.push(originalKey)
+              }
+            }
+            refactoringData = json.map((item:any)=>{
+                    for(let field of fieldsToRefactor){
+                      const key = field.split(' => ')[0]
+                      const dataItem = field.split(' => ')[1]
+                      item[key] = {
+                        ...item[key],
+                        [dataItem]:item[field]
+                      }
+                      delete item[field]
+                    }
+                    return item
+
+
+            })
+            
+            setImportedData({data:refactoringData,fileName:name})
+            callback && callback(refactoringData)
+            
+            
+           
+        };
+         
+    }
+    
+  }
+  const reset = ()=>{
+    setImportedData({})
+  }
+      return{
+        generateExcelFile,
+        importExcelFile,
+        importedExcelFile:importedData,
+        reset
+      }
+}
+export default useExport

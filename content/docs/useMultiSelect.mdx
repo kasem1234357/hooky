@@ -1,0 +1,200 @@
+---
+title: useMultiSelect
+description: Custom React Hook for multi select
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import React, { useState } from 'react';
+import MultiSelectExample from '@/examples/MultiSelectExample';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Multi Select**: Easily select multiple options from a list.
+- **Customization**: Customize the behavior based on your requirements.
+- **Simple Integration**: Seamlessly integrate into any React functional component.
+
+---
+## Exported Functions and values
+The hook exports the following:
+
+- `selectors`
+- `addItem`
+- `searchForItem`
+- `setSelectors`
+- `addArrayItems`
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| selectors | any[] | The array of selected items. |
+| addItem | (item: any) => void | Adds an item to the selectors array. |
+| searchForItem | (item: any) => number | Searches for an item in the selectors array and returns its index. If the item is not found, it returns -1. |
+| setSelectors | (items: any[]) => void | Sets the selectors array to the provided items. |
+| addArrayItems | (items: any[]) => void | Adds an array of items to the selectors array. |
+
+
+---
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+"use client"
+import React, { useState } from 'react'
+import useMultiSelect from '@/hooks/useMultiSelect'
+
+
+type Props = {}
+
+function MultiSelectExample({}: Props) {
+    const {selectors,addItem,removeItem,searchForItem,setSelectors,addArrayItems} = useMultiSelect();
+    const [isFound,setIsFound] = useState(false)
+    const [searchForItemState,setSearchForItemState] = useState(false)
+  return (
+    <div>
+        <h2>MultiSelect Example</h2>
+        <div className="flex gap-2 flex-wrap pb-4">
+        <button className="p-2 px-4 bg-blue-700 rounded-lg "  onClick={()=>{
+            addItem({id:0,name:'john',age:30,gender:'male'})
+        }}>
+            Add item
+            </button>
+            <button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+            addArrayItems([{id:0,name:'john',age:35,gender:'male'},{id:2,name:"jane",age:25,gender:'female'}])
+        }}>
+            Add array items
+            </button>
+            <button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+            removeItem({id:0,name:'john',age:30,gender:'male'})
+        }}>
+            Remove item
+            </button>
+            <button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+            setSelectors([{id:3,name:'john',age:35,gender:'male'},{id:4,name:"jane",age:45,gender:'female'}])
+        }}>
+            Set selectors
+            </button>
+            <button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+            setIsFound(searchForItem({id:0,name:'john',age:30,gender:'male'}) >= 0 )
+            setSearchForItemState(true)
+        }}>
+            Search for item
+            </button>
+            <button className="p-2 px-4 bg-blue-700 rounded-lg " onClick={()=>{
+            console.log(selectors)
+        }}>
+            Get selectors
+            </button>
+        </div>
+       { searchForItemState && <div className="text-wrap bg-neutral-800 my-2 p-2">
+        {JSON.stringify({id:0,name:'john',age:30,gender:'male'})}
+            {(isFound? <div>john object  Founded</div> : <div>john object Not Founded</div>)}
+            </div>}
+        <div className="text-wrap bg-neutral-800 my-2 p-2">
+            {JSON.stringify(selectors)}
+            </div>
+    </div>
+  )
+}
+
+export default MultiSelectExample
+  ```
+  </Tab>
+  <Tab value="view">
+    <MultiSelectExample />
+  </Tab>
+</Tabs>
+
+---
+
+## full Hook code
+```tsx
+import {useState} from 'react'
+const useMultiSelect = ()=>{
+    const [selectors, setSelectors] = useState <Array<any>>([]);
+    
+    /**
+     * @desc This function using to find an item inside selectors.
+     * TODO: this function will return the index of item of found else will return `0`
+     * @param { any } item
+     * @return { number }
+     */
+    const searchForItem = (item: any): number => {
+      let index: number = -1;
+    
+      // If the item is an object, perform a deep comparison
+      if (typeof item === "object" && item !== null) {
+        selectors.some((el, indexEl) => {
+          const keys1 = Object.keys(item);
+          const keys2 = Object.keys(el);
+    
+          // If the objects have different keys, skip this element
+          if (keys1.length !== keys2.length) {
+            return false;
+          }
+    
+          // Check if all keys and their values are equal
+          const isMatch = keys1.every((key) => el[key] === item[key]);
+    
+          if (isMatch) {
+            index = indexEl;
+            console.log('test');
+            
+            // Update the index to the current index
+            return true; // Stop further iteration
+          }
+    
+          return false; // Continue to the next element
+        });
+      } else {
+        // If the item is not an object, use a direct comparison
+        index = selectors.indexOf(item);
+      }
+      return index;
+    };
+    
+  
+    /**
+     * @desc This function using to add new item to selectors
+     * @param { any } item
+     * @return { void }
+     */
+    const addItem = (item: object): void => {
+      console.log(searchForItem(item ));
+      
+          searchForItem(item ) <0 && setSelectors(prev => [...prev,item])
+    }
+  
+    /**
+     * @desc This function using to remove an item from selectors array
+     * @param { any } item
+     * @return { void }
+     */
+    const removeItem = (item: any): void => {
+      const isset = searchForItem(item);
+      isset >= 0 && setSelectors((prev: Array<any>) => prev.filter((_selector: any, index: number) => index !== isset));
+    }
+  
+    /**
+     * @desc This function using to set a array of items.
+     * @param { Array<any> } items
+     * @return { void }
+     */
+    const addArrayItems = (items: Array<any>): void => {
+      items.forEach(item => {
+        addItem(item);
+      });
+    }
+  
+    return {
+      selectors,
+      addItem,
+      removeItem,
+      searchForItem,
+      setSelectors,
+      addArrayItems
+    }
+}
+
+export default useMultiSelect
+```

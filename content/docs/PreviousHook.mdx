@@ -1,0 +1,144 @@
+---
+title: usePrevious
+description: Custom React Hook
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import React, { useState } from 'react';
+import PreviousExample from '@/examples/PreviousExample';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Track Previous Value**: Easily access the previous value of a given input.
+- **Custom Handlers**: Define custom logic to execute when the value remains the same or changes.
+- **Simple Integration**: Seamlessly integrate into any React functional component.
+
+---
+## parameters 
+ all parameters are optional 
+ ```tsx
+ usePrevious(intialValue,option)
+ ```
+<TypeTable
+  type={{
+    intialValue: {
+      description:
+        'provide the initial value of the input. This is the value that will be compared with the current value to determine if the value has changed.',
+      type: 'any',
+    },
+    option:{
+      type:'object',
+      description:'provide the option object with custom handlers',
+    }
+  }}
+/>
+---
+### option
+
+<TypeTable
+  type={{
+    isTheSameFn: {
+      description:
+        'provide a function to execute when the value remains the same.',
+      type: 'function',
+      default:'null',
+    },
+    isnotTheSame: {
+      description:
+        'provide a function to execute when the value changes.',
+      type: 'function',
+      default:'null',
+    },
+  }}
+/>
+
+
+---
+## Example Usage 
+
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx 
+"use client";
+import React, { useState } from "react";
+import usePrevious from "@/hooks/usePrevious";
+
+function getRandomColor() {
+  const colors = ["green", "blue", "purple", "red", "pink"];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+export default function App() {
+  const [color, setColor] = React.useState(getRandomColor());
+  const {previousValue : previousColor} = usePrevious(color);
+
+  const handleClick = () => {
+    function getNewColor() {
+      const newColor = getRandomColor();
+      if (color === newColor) {
+        getNewColor();
+      } else {
+        setColor(newColor);
+      }
+    }
+    getNewColor();
+  };
+
+  return (
+    <section>
+      <h1>usePrevious</h1>
+      <button className="link" onClick={handleClick}>
+        Next
+      </button>
+      <article>
+        <figure>
+          <p style={{ background: `${previousColor}` }} />
+          <figcaption>Previous: {previousColor}</figcaption>
+        </figure>
+        <figure>
+          <p style={{ background: `${color}` }} />
+          <figcaption>Current: {color}</figcaption>
+        </figure>
+      </article>
+    </section>
+  );
+}
+
+```
+  </Tab>
+  <Tab value="view">
+  <PreviousExample/>
+  </Tab>
+</Tabs>
+---
+## Code Block
+
+```js
+import { useRef } from "react";
+
+export default function usePrevious(
+  value,
+  opt = { isTheSameFn: null, isnotTheSame: null }
+) {
+  const currentRef = useRef(value); //store current value
+  const previousRef = useRef();
+  let result = value;
+  let isTheSame = true;
+
+  if (currentRef.current !== value) {
+    opt.isnotTheSame && opt.isnotTheSame();
+    isTheSame = false;
+    previousRef.current = currentRef.current;
+
+    result = previousRef.current;
+    currentRef.current = value;
+  }
+  opt.isTheSameFn && opt.isTheSameFn();
+
+  return {
+    previousValue: result,
+    isTheSame,
+  };
+}

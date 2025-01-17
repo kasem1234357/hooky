@@ -1,0 +1,101 @@
+---
+title: useOutsideClick
+description: Custom React Hook for handling clicks outside of a ref
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import OutsideClickExample from '@/examples/OutsideClickExample';
+import React, { useState } from 'react';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Outside Click**: Handle clicks outside of a ref.
+- **Customization**: Customize the behavior based on your requirements.
+- **Simple Integration**: Seamlessly integrate into any React functional component.
+
+---
+## Expected Input
+The hook expects the following input:
+
+| Parameter | Type | Description | required |
+| --- | --- | --- |--- |
+| Ref |  `RefObject<HTMLElement>` | The ref of the element you want to monitor for clicks outside of. | true |
+| handler | (event: MouseEvent) => void | The function to be called when a click occurs outside of the ref. | true |
+| eventType? | string | The type of event to listen for. Default is 'mousedown'. |false |
+
+
+
+---
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+"use client"
+import useOutsideClick from '@/hooks/useOutsideClick'
+import React from 'react'
+
+type Props = {}
+
+function OutsideClickExample({}: Props) {
+    const divRef = React.useRef<HTMLDivElement>(null)
+    const [model,setModel] = React.useState(false)
+    useOutsideClick(divRef,()=>{
+        setModel(false)
+        
+    })
+  return (
+    <div className='p-5'>
+        <p>click outside of the div to hide the message</p>
+        <div className='w-full h-[300px] bg-blue-700 text-white text-2xl flex justify-center items-center rounded-lg' ref={divRef} onClick={()=>setModel(true)}>
+            <p>click on the dev to see massage</p>
+        </div>
+        {model && <p className='p-2 text-white bg-green-600'>i hope you have a nice day :)</p>}
+    </div>
+  )
+}
+
+export default OutsideClickExample
+  ```
+  </Tab>
+  <Tab value="view">
+    <OutsideClickExample />
+  </Tab>
+  </Tabs>
+
+---
+## Full Hook Code
+```tsx
+import { useEffect } from "react"
+
+const useOutsideClick = (Ref,handler,eventType='mousedown')=>{
+    // useEventListener(eventType, event => {
+    const outsideClickHandler = (event) =>{
+      const target = event.target 
+      if (!target || !target.isConnected) {
+               return
+              
+              }
+              const isOutside = Array.isArray(Ref)
+              ? Ref.every(r => r.current && !r.current.contains(target))
+              : Ref.current && !Ref.current.contains(target)
+        
+            if (isOutside) {
+              handler(event)
+            }
+    
+  }
+    useEffect(()=>{
+      window.addEventListener(eventType,(event)=>outsideClickHandler(event))
+    return window.removeEventListener(eventType,outsideClickHandler)
+    },[])
+    //     // Do nothing if the target is not connected element with document
+    //     if (!target || !target.isConnected) {
+    //       return
+    //     }
+  
+}
+
+export default useOutsideClick
+```

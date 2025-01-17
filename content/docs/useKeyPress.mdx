@@ -1,0 +1,192 @@
+---
+title: useKeyPress
+description: Custom React Hook for handling keyboard events
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import React, { useState } from 'react';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+import KeyPressExample from '@/examples/KeyPressExample';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+
+- Handles keyboard events
+- Supports multiple key combinations
+- Supports `keydown` and `keyup` events
+- Supports `keypress` events
+- Supports `keydown`, `keyup`, and `keypress` events
+---
+## Exported Functions and values
+
+The hook exports the following:
+
+- `addKeyPressEvent` add new event
+- `events` list of events
+
+---
+
+## Example Usage
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+  "use client"
+import useKeyPress from '@/hooks/useKeyPress';
+import React, { useEffect } from 'react'
+
+type Props = {}
+
+function KeyPressExample({}: Props) {
+    const {addKeyPressEvent} = useKeyPress();
+    useEffect(() => {
+    addKeyPressEvent({
+        keyCode:'R',
+        shiftKey: true,
+        ctrlKey: true,
+        callback: () => alert('hi from useKeyPress'),
+    })
+}, [])
+  return (
+    <div>
+        <h2 className='bg-blue-700 text-white p-2 rounded-lg'>press Ctrl + Shift + R to show alert</h2>
+    </div>
+  )
+}
+
+export default KeyPressExample
+```
+ </Tab>
+  <Tab value="view">
+  <KeyPressExample/>
+  </Tab>
+  </Tabs>
+
+
+<Callout  type="warn">
+  Some browsers (e.g., Chrome, Edge, Firefox) might block attempts to override critical shortcuts like Ctrl+W. This behavior cannot always be circumvented.
+  use different key combinations that aren’t reserved to solve this problem.
+</Callout>
+---
+## keypress data
+```tsx
+type KeyEventData = {
+  keyCode: string;
+  shiftKey: boolean;
+  ctrlKey: boolean;
+  callback: () => void;
+  redirect?: string;
+};
+```
+| Parameter | Type | Description |
+| --- | --- | --- |
+| keyCode | string | The key code of the key combination. |
+| shiftKey | boolean | Whether the shift key is pressed. |
+| ctrlKey | boolean | Whether the ctrl key is pressed. |
+| callback | () => void | The callback function to be executed when the key combination is pressed. |
+| redirect | string | The path to redirect to when the key combination is pressed. |
+
+---
+## full Hook code
+```tsx
+import { useCallback, useEffect, useState } from "react";
+
+type KeyEventData = {
+  keyCode: string;
+  shiftKey: boolean;
+  ctrlKey: boolean;
+  callback: () => void;
+  redirect?: string;
+};
+
+const useKeyPress = () => {
+  const [keyCodes, setKeyCodes] = useState<KeyEventData[]>([
+    {
+      keyCode:'KeyW',
+      shiftKey: false,
+      ctrlKey: true,
+      callback: () => console.log("hi from useState"),
+    },
+  ]);
+
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      let shouldPreventDefault = false;
+
+      keyCodes.forEach((keyData) => {
+        
+        if (
+          event.ctrlKey === keyData.ctrlKey &&
+          event.shiftKey === keyData.shiftKey &&
+          event.code === keyData.keyCode
+        ) {
+          shouldPreventDefault = true;
+          event.preventDefault(); // Prevent the browser's default action
+          event.stopImmediatePropagation();
+          event.stopPropagation(); // Stop propagation to other listeners
+          keyData.callback();
+          if (keyData.redirect) {
+            window.location.pathname = keyData.redirect;
+          }
+          
+        }
+      });
+      if (shouldPreventDefault) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation()
+      }
+    },
+    [keyCodes]
+  );
+
+  const addKeyPressEvent = useCallback(
+    (data: KeyEventData) => {
+      setKeyCodes((prev) => {
+        // Check if the event already exists
+        const isEventAlreadyAdded = prev.some(
+          (keyData) =>
+            keyData.keyCode === `Key${data.keyCode.toUpperCase()}` &&
+            keyData.shiftKey === data.shiftKey &&
+            keyData.ctrlKey === data.ctrlKey
+        );
+  
+        // If found, return the previous state without changes
+        if (isEventAlreadyAdded) {
+          console.warn("Event already exists, not adding duplicate.");
+          return prev;
+        }
+  
+        // Otherwise, add the new event
+        return [
+          ...prev,
+          { ...data, keyCode: `Key${data.keyCode.toUpperCase()}` },
+        ];
+      });
+    },
+    []
+  );
+  
+  useEffect(() => {
+    const pressEvent = (e: KeyboardEvent) => {
+      handleKeyPress(e);
+    };
+
+    // attach the event listener
+    document.addEventListener("keydown", pressEvent);
+
+    // remove the event listener
+    return () => {
+      document.removeEventListener("keydown", pressEvent);
+    };
+  }, [handleKeyPress]);
+
+  return {
+    addKeyPressEvent,
+    events: keyCodes,
+  };
+};
+
+export default useKeyPress;
+  ```

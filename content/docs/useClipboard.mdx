@@ -1,0 +1,136 @@
+---
+title: useClipBoard
+description: Custom React Hook for copying text to clipboard
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import React, { useState } from 'react';
+import ClipboardExample from '@/examples/ClipboardExample';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Copy Text to Clipboard**: Easily copy text to clipboard.
+- **Customization**: Customize the behavior based on your requirements.
+- **Simple Integration**: Seamlessly integrate into any React functional component.
+
+---
+## Exported Functions and values
+The hook exports the following:
+
+- `copyText`
+- `coppedText`
+- `isPremmisionAllow`
+- `clipBoardSupported`
+- `readTextFn`
+
+
+---
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+"use client";
+import useClipboard from "@/hooks/useClipBoard";
+
+const ClipboardExample = () => {
+    const {copyText,coppedText,isPremmisionAllow,readTextFn} = useClipboard();
+    return (
+        <div>
+            <h2>useClipboard Hook Example</h2>
+            <p>Copy Text to Clipboard</p>
+            <button className="link" onClick={()=>{
+                copyText('hello world',()=>console.log('copied'))
+            }}>
+
+                Copy hello world
+                </button>
+                <p>Text: {coppedText}</p>
+                <p>isPremmisionAllow: {isPremmisionAllow?"true":"false"}</p>
+                
+                </div>
+                );
+                };
+
+
+                export default ClipboardExample;
+  ```
+  </Tab>
+  <Tab value="view">
+  <ClipboardExample/>
+  </Tab>
+  </Tabs>
+### copyToClipboard
+Copies the given text to the clipboard.
+```tsx
+function copyText(text: string,callback?:()=>void): void;
+```
+<TypeTable
+  type={{
+    text: {
+      type: 'string',
+      description: 'The text to be copied to the clipboard.',
+      default: '""',
+    },
+    callback:{
+        type:'()=>void',
+        description:'callback function',
+        default:'null',
+    }
+  }}
+/>
+---
+## Hook Full code
+```tsx
+import { useEffect, useState } from "react";
+
+function clipBoardSupported(successCb=null,failedCb=null) {
+    if (navigator.clipboard) {
+      console.log("clipboard is supported by this browser :)");
+      successCb && successCb()
+      return true
+    } else {
+      console.log("clipboard is NOT supported by this browser :(");
+      failedCb && failedCb()
+      return false
+    }
+  }
+  const useClipBoard = ()=>{
+    const [isPremmisionAllow,setIsPremmisionAllow]=useState(true)
+    const [coppedText,setCoppedText] = useState('')
+    const copyText =(text,callback)=>{
+        if(navigator.clipboard){
+            navigator.clipboard.readText()
+            navigator.clipboard.writeText(text)
+            setCoppedText(text)
+            callback && callback()
+        }
+        
+    }
+    const readTextFn = (callback?:(text:string)=>void)=>{
+        if(navigator.clipboard){
+            const textCopped = navigator.clipboard.readText().then((text)=>{
+                callback && callback(text)
+                return text
+                })
+            return textCopped
+        }
+    }
+  useEffect(()=>{
+    clipBoardSupported()&& setIsPremmisionAllow(true)
+  },[])
+    // clipBoardSupported()&& setIsPremmisionAllow(true)
+     const isClibBoardEmpty = navigator.clipboard?navigator.clipboard.readText()=='':null
+
+    return{
+        isPremmisionAllow,
+        clipBoardSupported,
+        coppedText,
+        copyText,
+        readTextFn,
+         isClibBoardEmpty
+    }
+  }
+  export default useClipBoard
+  ```
