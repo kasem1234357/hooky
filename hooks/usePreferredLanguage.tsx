@@ -1,7 +1,7 @@
 import { useRef } from "react"
 
 const usePreferreLanguage = ()=>{
-  let lang:React.MutableRefObject<string | undefined> = useRef()
+  let lang:React.RefObject<string | null> = useRef(null)
   if(navigator.language ){
     lang.current = navigator.language
   }

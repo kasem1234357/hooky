@@ -7,7 +7,7 @@ export default function useTimeout(
   asInitialValue= false
 ) {
   const callbackRef = useRef(callback);
-  const timeoutRef = useRef();
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
     callbackRef.current = callback;
