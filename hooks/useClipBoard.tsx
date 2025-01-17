@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function clipBoardSupported(successCb=null,failedCb=null) {
+function clipBoardSupported(successCb?:()=>void,failedCb?:()=>void) {
     if (navigator.clipboard) {
       console.log("clipboard is supported by this browser :)");
       successCb && successCb()
@@ -14,7 +14,7 @@ function clipBoardSupported(successCb=null,failedCb=null) {
   const useClipBoard = ()=>{
     const [isPremmisionAllow,setIsPremmisionAllow]=useState(true)
     const [coppedText,setCoppedText] = useState('')
-    const copyText =(text,callback)=>{
+    const copyText =(text:string,callback:()=>void)=>{
         if(navigator.clipboard){
             navigator.clipboard.readText()
             navigator.clipboard.writeText(text)
@@ -36,6 +36,7 @@ function clipBoardSupported(successCb=null,failedCb=null) {
     clipBoardSupported()&& setIsPremmisionAllow(true)
   },[])
     // clipBoardSupported()&& setIsPremmisionAllow(true)
+    //@ts-ignore
      const isClibBoardEmpty = navigator.clipboard?navigator.clipboard.readText()=='':null
 
     return{

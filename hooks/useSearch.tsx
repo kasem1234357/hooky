@@ -11,6 +11,7 @@ const useSearch =()=>{
     const [filteredData,setFilteredData]=useState({})
     
     const filterBy =(data:Object[],filterMethod:string,filterText:string)=>{
+        //@ts-ignore
          const newData =data.slice(0,data.length).filter((dt) => typeof dt[filterMethod].includes(filterText))
          if(data !== newData){
             setFilteredItemNumber(newData.length);

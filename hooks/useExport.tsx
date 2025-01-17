@@ -1,13 +1,13 @@
 import { useState } from "react";
 import {utils,writeFile, readFile,} from "xlsx";
 const useExport =()=>{
-  const unvalidKey =[]
+  const unvalidKey:string[] =[]
   const [importedData,setImportedData]=useState({})
   
-  const convertArrayToString = (key,item,data,i)=>{
+  const convertArrayToString = (key:string,item:any,data:any,i:number)=>{
      if(item.hasOwnProperty('length')){
        if(i === 0){
-         const state = item.every(el => typeof(el) !=='object')
+         const state = item.every((el:any) => typeof(el) !=='object')
          if(!state) {
            unvalidKey.push(key)
            return item
@@ -26,7 +26,7 @@ const useExport =()=>{
        delete data[key]
      }
   }
-  const  generateExcelFile=(data,fileName,option={})=>{
+  const  generateExcelFile=(data:any,fileName:string,option:{limitFields?:string[]}={})=>{
     for(let i=0;i<data.length;i++){
       if(option?.limitFields){
         for(let item of option.limitFields){
@@ -52,7 +52,7 @@ const useExport =()=>{
     utils.book_append_sheet(workbook, worksheet, "Sheet1");
     writeFile(workbook, `${fileName}.xlsx`);
   }
-  const importExcelFile =(e,callback?:(data:any)=>void)=>{
+  const importExcelFile =(e:any,callback?:(data:any)=>void)=>{
     e.preventDefault();
     if (e.target.files) {
       let jsonFile ={}
@@ -60,14 +60,15 @@ const useExport =()=>{
         const reader = new FileReader();
         reader.readAsArrayBuffer(e.target.files[0]);
         reader.onload = (e) => {
-            const data = e.target.result;
+          //@ts-ignore
+            const data:any = e.target.result;
             const workbook = readFile(data, { type: "array" });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             const json = utils.sheet_to_json(worksheet);
             let refactoringData:{[key:string]:any} =[];
             const fieldsToRefactor:string[] = []
-
+//@ts-ignore
             for(let originalKey of Object.keys(json[0])){
               if(originalKey.indexOf(' => ') !== -1){
                 fieldsToRefactor.push(originalKey)

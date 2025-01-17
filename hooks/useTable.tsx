@@ -39,6 +39,7 @@ const useTable = (steps:number) => {
   const handleSearch = (time:number, callback:()=> void): void=>{
     let timer:number|undefined;
     clearInterval(timer);
+    //@ts-ignore
     timer = setTimeout(()=> {
       callback();
       clearTimeout(timer);

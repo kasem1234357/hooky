@@ -17,8 +17,10 @@ const useUpload = () => {
     setPath('')
     setType('')
   }
+  //@ts-ignore
   const uploadData = (e,callBack:(result:string)=>void) => {
     e.preventDefault();
+    //@ts-ignore
     const reader = (readFile) =>
       new Promise((resolve, reject) => {
         const fileReader = new FileReader();
@@ -30,8 +32,9 @@ const useUpload = () => {
        reader(e.target.files[0]).then((result) => {
         console.log(e.target.files[0],result);
         console.log(typeof(result));
-        
+        //@ts-ignore
         callBack && callBack(result)
+        //@ts-ignore
         setData(result)
         setSize(parseFloat(((e.target.files[0].size)/(1024*1024)).toFixed(2)))
         setType(e.target.files[0].type)

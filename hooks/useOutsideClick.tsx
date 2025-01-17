@@ -1,9 +1,10 @@
 import { useEffect } from "react"
 
-const useOutsideClick = (Ref,handler,eventType='mousedown')=>{
+const useOutsideClick = (Ref:any,handler:(event:Event)=>void,eventType='mousedown')=>{
     // useEventListener(eventType, event => {
-    const outsideClickHandler = (event) =>{
+    const outsideClickHandler = (event:Event) =>{
       const target = event.target 
+      //@ts-ignore
       if (!target || !target.isConnected) {
                return
               

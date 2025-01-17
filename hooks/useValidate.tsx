@@ -13,6 +13,7 @@ const useValidate = ()=>{
         password:"Password should be 8-20 characters and include at least 1 letter, 1 number and 1 special character!",
     })
     const isValidate =(data:string,type:string):boolean =>{
+        //@ts-ignore
         const result = new RegExp(regex[type as keyof typeof regex]).test(data)
         setValidate(result)
         return result

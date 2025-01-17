@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 
 export default function useTimeout(
-  callback,
-  delay,
-  depancey,
+  callback: () => void,
+  delay: number,
+  depancey: any[],
   asInitialValue= false
 ) {
   const callbackRef = useRef(callback);
@@ -15,7 +15,7 @@ export default function useTimeout(
 
   const set = useCallback(() => {
     console.log("from set", new Date().getTime());
-
+//@ts-ignore
     timeoutRef.current = setTimeout(() => {
       console.log(new Date().getTime());
 
