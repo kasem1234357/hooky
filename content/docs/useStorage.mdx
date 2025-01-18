@@ -19,7 +19,7 @@ import { TypeTable } from 'fumadocs-ui/components/type-table';
 
 | items | Type | Description |
 | --- | --- | --- |
-| getAllStorageItem | () => any | Returns an array of all the storage items. |
+| getAllStorageItem | (storageType: "localStorage" | "sessionStorage") => any | Returns an array of all the storage items. |
 | getStorageData | (key: string, storageType?: "localStorage" \| "sessionStorage") => any | Returns the value of the specified key. |
 | isEmptyStorage | (storageType?: "localStorage" \| "sessionStorage") => boolean | Returns true if the storage is empty. |
 | setStorageData | (key: string, value: any, storageType?: "localStorage" \| "sessionStorage") => void | Sets the value of the specified key. |
