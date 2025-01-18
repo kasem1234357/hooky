@@ -40,7 +40,7 @@ const useStorage = () => {
     let type = storageType === "localStorage" ? localStorage : sessionStorage;
     let keys = Object.keys(type);
     for (let key of keys) {
-      values.push({key:type.getItem(key)});
+      values.push({[key]:type.getItem(key)});
     }
     return values;
   };

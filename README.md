@@ -1,26 +1,144 @@
-# hooky4
+# Completed
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+- [x] useClickOutside
+- [x] useMultiSelect
+- [x] useCalendar
+- [x] useClipBoard
+- [x] usePrevious
+- [x] useExport
+- [x] useKeyPress
+- [x] useTime
+- [x] useStorage (docs)
 
-Run development server:
+---
 
-```bash
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
-```
+## in progress
 
-Open http://localhost:3000 with your browser to see the result.
+- [ ] useCookies (docs)
+- [ ] usePreferredLanguage (improvement)
 
-## Learn More
+---
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
+## Need documentation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.vercel.app) - learn about Fumadocs
+---
+
+## Need improvement
+
+- [ ] useUpload
+- [ ] useHistory
+- [ ] useValidate
+
+---
+
+## Need to be tested
+
+- [ ] useDebounce
+- [ ] useTimeout
+- [ ] useTable
+- [ ] useSearch
+- [ ] useSort
+
+## Need to be fixed
+
+- [ ] usePrint
+- [ ] useGeolocation
+
+## in Feature
+
+- [ ] useScroll
+- [ ] usePagination
+- [ ] useAuth
+- [ ] useToast
+- [ ] useFetch
+- [ ] useWindowSize
+- [ ] useInterval
+- [ ] useHover
+- [ ] useToggle
+- [ ] useEventListener
+- [ ] useOnScreen
+- [ ] useForceUpdate
+- [ ] useUndoRedo
+- [ ] useThrottle
+- [ ] useMemoCompare
+- [ ] useDragAndDrop
+- [ ] useFocusTrap
+- [ ] useSwipe
+- [ ] useLongPress
+- [ ] useWebSocket
+- [ ] useApi
+- [ ] usePolling
+- [ ] useMediaQuery
+- [ ] useAudio
+- [ ] useVideo
+- [ ] useSpring
+- [ ] useTransition
+- [ ] useParallax
+- [ ] useNetworkStatus
+- [ ] useBattery
+- [ ] useDeviceOrientation
+- [ ] useMediaDevices
+- [ ] useDeepCompareEffect
+- [ ] useIsMounted
+- [ ] useFocusVisible
+- [ ] useMutationObserver
+- [ ] useVirtualList
+- [ ] useOptimisticUpdate
+- [ ] useImmutableState
+- [ ] useDeepState
+- [ ] useResourceCache
+- [ ] useConcurrentEffect
+- [ ] useDynamicImport
+- [ ] useWebWorker
+- [ ] useSSE
+- [ ] useSyncState
+- [ ] useRetry
+- [ ] useGesture
+- [ ] useInteractiveMap
+- [ ] useDynamicTheme
+- [ ] usePriorityQueue
+- [ ] useIntersectionObserver
+- [ ] useCanvas
+- [ ] useWebGL
+- [ ] useMorph
+- [ ] usePWA
+- [ ] useServiceWorker
+- [ ] usePermission
+- [ ] useDarkModeDetection
+- [ ] useA11yChecker
+- [ ] useFocusManagement
+- [ ] useSpeechRecognition
+- [ ] useAccessibilityTree
+- [ ] useOAuth
+- [ ] useJwtAuth
+- [ ] useEncryption
+- [ ] useErrorBoundary
+- [ ] usePerformanceMetrics
+- [ ] useDebugLogger
+- [ ] useI18n
+- [ ] useShadowDOM
+- [ ] useDiffState
+- [ ] useVersionedState
+- [ ] useErrorBoundary (next.js)
+- [ ] useDynamicRoute (next.js)
+- [ ] useQueryParams (next.js)
+- [ ] useEnvironment
+- [ ] useSocketIO
+- [ ] usePusher
+- [ ] usePushNotifications
+- [ ] useMultipartUpload (s3 with next.js)
+- [ ] useDropzone
+- [ ] useGraphQLSSR
+- [ ] useElasticSearch
+- [ ] useAlgoliaSearch
+- [ ] useGoogleAnalytics
+- [ ] useMixpanel
+- [ ] useImgix
+- [ ] useCloudinaryUpload
+- [ ] usePayPal
+- [ ] useStripe
+- [ ] useFirebaseAuth
+- [ ] useClerk
+- [ ] useUrqlHooks
+- [ ] useApolloClient
+- [ ] useEmotion
