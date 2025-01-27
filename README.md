@@ -1,7 +1,6 @@
 # Completed
 
 - [x] useClickOutside
-- [x] useMultiSelect
 - [x] useCalendar
 - [x] useClipBoard
 - [x] usePrevious
@@ -9,13 +8,16 @@
 - [x] useKeyPress
 - [x] useTime
 - [x] useStorage (docs)
+- [x] useCookies (docs)
+- [x] usePreferredLanguage (improvement)
 
 ---
 
 ## in progress
 
-- [ ] useCookies (docs)
-- [ ] usePreferredLanguage (improvement)
+- [ ] useUpload (improvement)
+- [ ] useGeolocation (fixed)
+- [x] useMultiSelect (improvement from mocion project)
 
 ---
 
@@ -25,7 +27,6 @@
 
 ## Need improvement
 
-- [ ] useUpload
 - [ ] useHistory
 - [ ] useValidate
 
@@ -42,7 +43,6 @@
 ## Need to be fixed
 
 - [ ] usePrint
-- [ ] useGeolocation
 
 ## in Feature
 

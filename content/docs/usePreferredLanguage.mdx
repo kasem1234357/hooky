@@ -1,0 +1,63 @@
+---
+title: usePreferredLanguage
+description: Custom React Hook for detecting the user's preferred language
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import PreferredLanguageExample from '@/examples/PreferredLanguageExample';
+
+## Features
+- **Manage Language State**: Manage the language state in your React application.
+- **Customization**: Customize the behavior based on your requirements.
+- **Simple Integration**: Seamlessly integrate into any React functional component.
+
+---
+## Exported Functions and values
+The hook exports the following:
+
+- `lang`
+- `setLang`
+---
+| Parameter | Type | Description |
+| --- | --- | --- |
+| lang | string | The current language of the user. |
+| setLang | (newLang: string) => void | Updates the language state and the browser's HTML lang attribute. |
+
+---
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+  "use client"
+import usePreferredLanguage from "@/hooks/usePreferredLanguage";
+import React from "react";
+
+
+const PreferredLanguageExample = () => {
+  const { lang, setLang } = usePreferredLanguage("en");
+
+  const handleChangeLanguage = (newLang: string) => {
+    setLang(newLang); // Change language dynamically
+  };
+
+  return (
+    <div>
+      <h1>Your Preferred Language</h1>
+      <p>Current Language: {lang}</p>
+      <button onClick={() => handleChangeLanguage("fr")}>Switch to French</button>
+      <button onClick={() => handleChangeLanguage("es")}>Switch to Spanish</button>
+    </div>
+  );
+};
+
+export default PreferredLanguageExample;
+
+```
+</Tab>
+<Tab value="view">
+<PreferredLanguageExample/>
+</Tab>
+</Tabs>
+
