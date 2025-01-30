@@ -1,0 +1,145 @@
+---
+title: useGuoLocation
+description: Custom React Hook for accessing user geolocation
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import GuoLocationExample from '@/examples/GuoLocationExample';
+import React, { useState } from 'react';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Geolocation Access**: Retrieve the user's current latitude and longitude.
+- **Permission Handling**: Check if the user has granted permission to access their location.
+- **Browser Support**: Verify if the browser supports the Geolocation API.
+
+---
+
+## Exported Functions and Values
+
+| Item                | Type      | Description                                                                 |
+|---------------------|-----------|-----------------------------------------------------------------------------|
+| `latitude`          | `number`  | The user's current latitude. Defaults to `0` if not available.              |
+| `longitude`         | `number`  | The user's current longitude. Defaults to `0` if not available.             |
+| `isPremmisionAllow` | `boolean` | Indicates whether the user has granted permission to access their location. |
+| `geolocationSupported` | `function` | Checks if the browser supports the Geolocation API. Returns `true` if supported, otherwise `false`. |
+
+---
+
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+"use client"
+import useGuoLocation from '@/hooks/useGuoLocation';
+import React from 'react';
+
+function GuoLocationExample() {
+  const { latitude, longitude, geolocationSupported, isPremmisionAllow } = useGuoLocation();
+
+  return (
+    <div className='flex flex-col gap-2'>
+      <p>Geolocation Example</p>
+      {geolocationSupported() ? (
+        <>
+          <p>Latitude: {latitude}</p>
+          <p>Longitude: {longitude}</p>
+          <p>Permission Allowed: {isPremmisionAllow ? 'Yes' : 'No'}</p>
+        </>
+      ) : (
+        <p>Geolocation is not supported by your browser.</p>
+      )}
+    </div>
+  );
+}
+
+export default GuoLocationExample;
+  ```
+  </Tab> <Tab value="view"> <GuoLocationExample /> </Tab> </Tabs>
+  ---
+
+## full Hook code
+```tsx
+import { useState } from "react";
+
+const useGuoLocation = () => {
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
+  const [isPremmisionAllow, setIsPremmisionAllow] = useState(false);
+
+  function geolocationSupported() {
+    if (navigator.geolocation) {
+      console.log("Geolocation is supported by this browser :)");
+      return true;
+    } else {
+      console.log("Geolocation is NOT supported by this browser :(");
+      return false;
+    }
+  }
+
+  function getCurrentLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (result) => {
+          setLatitude(result.coords.latitude);
+          setLongitude(result.coords.longitude);
+          setIsPremmisionAllow(true);
+          console.log(result);
+        },
+        () => setIsPremmisionAllow(false)
+      );
+    }
+  }
+
+  getCurrentLocation();
+
+  return {
+    latitude,
+    longitude,
+    geolocationSupported,
+    isPremmisionAllow,
+  };
+};
+
+export default useGuoLocation;
+```
+---
+## How It Works
+
+### Geolocation Support Check:
+
+The `geolocationSupported` function checks if the browser supports the Geolocation API.
+
+### Permission Handling:
+
+- The hook automatically requests permission to access the user's location when the component mounts.
+- If the user grants permission, `isPremmisionAllow` is set to `true`, and the `latitude` and `longitude` are updated.
+
+### Default Values:
+
+- If the user denies permission or the browser does not support geolocation, `latitude` and `longitude` default to `0`.
+
+---
+
+## Best Practices
+
+### Check for Geolocation Support:
+
+Always call `geolocationSupported()` before attempting to use the `latitude` and `longitude` values.
+
+### Handle Permission Denial:
+
+If `isPremmisionAllow` is `false`, inform the user that location access is required for certain features.
+
+### Fallback for Unsupported Browsers:
+
+Provide a fallback UI or message for browsers that do not support the Geolocation API.
+
+---
+
+## Limitations
+
+- The hook only retrieves the user's location once when the component mounts. If you need real-time updates, consider extending the hook to use `navigator.geolocation.watchPosition`.
+- The default values for `latitude` and `longitude` are `0`, which may not be meaningful in all contexts. Handle this case appropriately in your application.

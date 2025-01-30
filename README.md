@@ -7,17 +7,17 @@
 - [x] useExport
 - [x] useKeyPress
 - [x] useTime
-- [x] useStorage (docs)
-- [x] useCookies (docs)
-- [x] usePreferredLanguage (improvement)
+- [x] useStorage
+- [x] useCookies
+- [x] usePreferredLanguage
+- [x] useMultiSelect
+- [x] useGeolocation
 
 ---
 
 ## in progress
 
 - [ ] useUpload (improvement)
-- [ ] useGeolocation (fixed)
-- [x] useMultiSelect (improvement from mocion project)
 
 ---
 

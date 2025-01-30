@@ -8,12 +8,12 @@ const useMultiSelect = ()=>{
      * @param { any } item
      * @return { number }
      */
-    const searchForItem = (item: any): number => {
+    const searchForItem = (item: any,externalSelectors?:Array<any>): number => {
       let index: number = -1;
-    
+      const currentSelectors = externalSelectors || selectors;
       // If the item is an object, perform a deep comparison
       if (typeof item === "object" && item !== null) {
-        selectors.some((el, indexEl) => {
+        currentSelectors.some((el, indexEl) => {
           const keys1 = Object.keys(item);
           const keys2 = Object.keys(el);
     
@@ -37,7 +37,7 @@ const useMultiSelect = ()=>{
         });
       } else {
         // If the item is not an object, use a direct comparison
-        index = selectors.indexOf(item);
+        index = currentSelectors.indexOf(item);
       }
       return index;
     };
