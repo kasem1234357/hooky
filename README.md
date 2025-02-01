@@ -12,12 +12,11 @@
 - [x] usePreferredLanguage
 - [x] useMultiSelect
 - [x] useGeolocation
+- [x] useUpload
 
 ---
 
 ## in progress
-
-- [ ] useUpload (improvement)
 
 ---
 

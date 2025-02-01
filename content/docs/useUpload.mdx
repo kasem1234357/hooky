@@ -1,0 +1,270 @@
+---
+title: useUpload
+description: Custom React Hook for handling file uploads, including chunked uploads and progress tracking.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import UploadExample from '@/examples/UploadExample';
+import React from 'react';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **File Upload**: Upload files as DataURL or in chunks as ArrayBuffer.
+- **Progress Tracking**: Track upload progress in real-time.
+- **Chunked Uploads**: Upload large files in smaller chunks for better performance.
+- **Metadata Extraction**: Automatically extract file metadata (name, size, type, extension).
+- **Reset Functionality**: Reset the upload state easily.
+
+---
+
+## Exported Functions and Values
+
+| Name               | Type                                                                 | Description                                                                 |
+|--------------------|----------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `path`             | `string`                                                            | The file path (currently unused in the hook).                               |
+| `fileData`         | `ArrayBuffer \| string \| null`                                     | The uploaded file data (either as DataURL or ArrayBuffer).                  |
+| `name`             | `string`                                                            | The name of the uploaded file.                                              |
+| `type`             | `string`                                                            | The MIME type of the uploaded file.                                         |
+| `size`             | `number`                                                            | The size of the uploaded file in MB.                                        |
+| `ext`              | `string`                                                            | The file extension (e.g., "pdf", "jpg").                                    |
+| `uploadData`       | `(e: ChangeEvent<HTMLInputElement>, callback?: (result: string) => void) => void` | Uploads a file as a DataURL.                                                |
+| `uploadDataInChunks` | `(e: ChangeEvent<HTMLInputElement>, callback?: (result: ArrayBuffer[]) => void) => void` | Uploads a file in chunks as ArrayBuffer.                                    |
+| `reset`            | `() => void`                                                        | Resets all state values to their initial state.                             |
+| `isEmpty`          | `boolean`                                                           | Indicates whether the file data is empty.                                   |
+| `loading`          | `boolean`                                                           | Indicates whether an upload is in progress.                                 |
+| `progress`         | `number`                                                            | The upload progress percentage (0 to 100).                                  |
+| `chunkSize`        | `number`                                                            | The size of each chunk in bytes (default: 16384).                           |
+| `setChunkSize`     | `(size: number) => void`                                            | Updates the chunk size for chunked uploads.                                 |
+
+---
+
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+"use client"
+import useUpload from '@/hooks/useUpload';
+import React, { ChangeEvent } from 'react';
+
+function UploadExample() {
+  const {
+    fileData,
+    name,
+    type,
+    size,
+    ext,
+    uploadData,
+    uploadDataInChunks,
+    reset,
+    isEmpty,
+    loading,
+    progress,
+    chunkSize,
+    setChunkSize,
+  } = useUpload();
+
+  const handleUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    uploadData(e, (result) => {
+      console.log("File uploaded as DataURL:", result);
+    });
+  };
+
+  const handleUploadInChunks = (e: ChangeEvent<HTMLInputElement>) => {
+    uploadDataInChunks(e, (chunks) => {
+      console.log("File uploaded in chunks:", chunks);
+      // Send chunks to the server or process them further
+    });
+  };
+
+  return (
+    <div>
+      <h1>File Upload</h1>
+      <input type="file" onChange={handleUpload} />
+      <input type="file" onChange={handleUploadInChunks} />
+      <button onClick={reset}>Reset</button>
+
+      <div>
+        <label>
+          Chunk Size (bytes):
+          <input
+            type="number"
+            value={chunkSize}
+            onChange={(e) => setChunkSize(Number(e.target.value))}
+          />
+        </label>
+      </div>
+
+      {loading && <p>Uploading... {progress.toFixed(2)}%</p>}
+      {!isEmpty && (
+        <div>
+          <p>File Name: {name}</p>
+          <p>File Type: {type}</p>
+          <p>File Size: {size} MB</p>
+          <p>File Extension: {ext}</p>
+          {fileData && <p>File Data: {typeof fileData === "string" ? "DataURL" : "ArrayBuffer"}</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default UploadExample;
+```
+</Tab>
+<Tab value="view"> <UploadExample /> </Tab> </Tabs>
+
+---
+## Full Hook Code
+```tsx
+import { ChangeEvent, useState } from "react";
+
+/**
+ * Extracts the file extension from a filename.
+ * @param name - The filename (e.g., "example.pdf").
+ * @returns The file extension (e.g., "pdf").
+ */
+function getFileExtension(name: string): string {
+  return name.slice(name.lastIndexOf(".") + 1);
+}
+
+/**
+ * Custom React Hook for handling file uploads.
+ */
+const useUpload = () => {
+  const [path, setPath] = useState<string>("");
+  const [fileData, setFileData] = useState<ArrayBuffer | string | null>(null);
+  const [ext, setExt] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [type, setType] = useState<string>("");
+  const [size, setSize] = useState<number>(0);
+  const [progress, setProgress] = useState<number>(0);
+  const [isEmpty, setIsEmpty] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [chunkSize, setChunkSize] = useState<number>(16384); // Default chunk size: 16KB
+
+  /**
+   * Resets all state values to their initial state.
+   */
+  const reset = () => {
+    setFileData(null);
+    setExt("");
+    setName("");
+    setSize(0);
+    setPath("");
+    setType("");
+    setIsEmpty(true);
+    setLoading(false);
+    setProgress(0);
+  };
+
+  /**
+   * Uploads a file as a DataURL.
+   */
+  const uploadData = (
+    e: ChangeEvent<HTMLInputElement>,
+    callback?: (result: string) => void
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setName(file.name);
+    setSize(parseFloat((file.size / (1024 * 1024)).toFixed(2))); // Convert size to MB
+    setType(file.type);
+    setExt(getFileExtension(file.name));
+    setIsEmpty(false);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      callback?.(result);
+      setFileData(result);
+    };
+    reader.onerror = () => {
+      console.error("Error reading file.");
+      setLoading(false);
+      setIsEmpty(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  /**
+   * Uploads a file in chunks as ArrayBuffer.
+   */
+  const uploadDataInChunks = async (
+    e: ChangeEvent<HTMLInputElement>,
+    callback?: (result: ArrayBuffer[]) => void
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    setName(file.name);
+    setSize(file.size);
+    setExt(getFileExtension(file.name));
+    setType(file.type);
+    setIsEmpty(false);
+
+    const chunks: ArrayBuffer[] = [];
+    let offset = 0;
+
+    while (offset < file.size) {
+      const chunk = await readChunk(file, offset, chunkSize);
+      chunks.push(chunk);
+      offset += chunkSize;
+
+      // Update progress
+      const percent = (offset / file.size) * 100;
+      setProgress(percent);
+    }
+
+    setLoading(false);
+    setProgress(100); // Set progress to 100% after all chunks are read
+    callback?.(chunks);
+  };
+
+  /**
+   * Reads a chunk of the file.
+   */
+  const readChunk = (file: File, offset: number, size: number): Promise<ArrayBuffer> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      const blob = file.slice(offset, offset + size);
+
+      reader.onload = () => {
+        if (reader.result instanceof ArrayBuffer) {
+          resolve(reader.result);
+        } else {
+          reject(new Error("Failed to read chunk as ArrayBuffer."));
+        }
+      };
+
+      reader.onerror = () => {
+        reject(new Error("Error reading file chunk."));
+      };
+
+      reader.readAsArrayBuffer(blob);
+    });
+  };
+
+  return {
+    path,
+    fileData,
+    name,
+    type,
+    size,
+    ext,
+    uploadData,
+    reset,
+    isEmpty,
+    loading,
+    progress,
+    uploadDataInChunks,
+    chunkSize,
+    setChunkSize,
+  };
+};
+
+export default useUpload;
+```
