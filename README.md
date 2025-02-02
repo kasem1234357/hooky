@@ -18,6 +18,10 @@
 
 ## in progress
 
+- [ ] useDebounce (testing)
+- [ ] useTimeout (testing)
+- [ ] useValidate (improvement)
+
 ---
 
 ## Need documentation
@@ -27,14 +31,11 @@
 ## Need improvement
 
 - [ ] useHistory
-- [ ] useValidate
 
 ---
 
 ## Need to be tested
 
-- [ ] useDebounce
-- [ ] useTimeout
 - [ ] useTable
 - [ ] useSearch
 - [ ] useSort
