@@ -1,0 +1,93 @@
+---
+title: useDebounce
+description: Custom React Hook for debouncing function calls
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+
+import IntervalExample from '@/examples/IntervalExample';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Debounce Function Calls**: Debounce function calls to improve performance.
+- **Customization**: Customize the behavior based on your requirements.
+- **Simple Integration**: Seamlessly integrate into any React functional component.
+
+---
+## Exported Functions and values
+The hook exports the following:
+
+- `reset` function to restart the timer
+- `clear` function to clear the timer
+---
+| Parameter | Type | Description |
+| --- | --- | --- |
+| callback | () => void | The function to be debounced. |
+| delay | number | The delay in milliseconds. |
+| dependencies | any[] | The dependencies of the callback function. |
+| asInitialValue | boolean | Whether to set the timer as initial value. |
+
+---
+## Example Usage
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+  ```tsx
+  "use client"
+import useDebounce from '@/hooks/useDebounce';
+import React, { useState } from 'react'
+
+type Props = {}
+
+function IntervalExample({}: Props) {
+    const [count, setCount] = useState(0);
+    const {reset, clear} = useDebounce(() => {
+        setCount(prev =>( prev + 1));
+    }, 1000, [],false);
+    return (
+        <div>
+            <h2 className='bg-blue-700 text-white p-2 rounded-lg'>
+                Press the button to see the count change every second
+            </h2>
+            <button onClick={reset} className='bg-green-500 text-white p-2 rounded-lg mr-5'>
+                step
+            </button>
+            <button onClick={clear} className='bg-red-500 text-white p-2 rounded-lg'>
+                Clear
+            </button>
+            <p className='p-2 rounded-lg bg-gray-100 text-black'>Count: {count}</p>
+        </div>
+    )
+}
+
+export default DebounceExample
+```
+ </Tab>
+  <Tab value="view">
+  <IntervalExample/>
+  </Tab>    
+  </Tabs>
+
+## full Hook code
+```tsx
+import { useEffect } from "react";
+import useTimeout from "./useTimeout";
+
+/* 
+    useDebounce use Cases
+    implement setTimeout with specific dependency
+
+
+*/
+export default function useDebounce(
+  callback: () => void,
+  delay:number,
+  dependencies: any[],
+  asInitialValue=false
+) {
+  const { reset, clear } = useTimeout(callback, delay, dependencies,asInitialValue);
+  useEffect(reset, [...dependencies, reset]);
+  useEffect(clear, []);
+  return {reset,clear}
+}
+  ```
