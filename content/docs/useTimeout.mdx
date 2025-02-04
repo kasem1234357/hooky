@@ -1,0 +1,112 @@
+---
+title: useTimeout
+description: Custom React Hook for managing timeouts with reset and clear functionality.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import TimeoutExample from '@/examples/TimeoutExample';
+
+## Features
+- **Timeout Management**: Set a timeout that can be reset or cleared dynamically.
+- **Automatic Cleanup**: Automatically clears timeout on component unmount or dependency changes.
+- **Dependency Tracking**: Restarts timeout when specified dependencies change.
+- **Initial Execution**: Optionally execute timeout immediately upon hook initialization.
+
+---
+
+## Parameters
+
+| Name             | Type         | Default | Description                                                                 |
+|------------------|--------------|---------|-----------------------------------------------------------------------------|
+| `callback`       | `() => void` | —       | Function to be executed after the delay period.                             |
+| `delay`          | `number`     | —       | Delay duration in milliseconds before callback execution.                  |
+| `depancey`       | `any[]`      | `[]`    | Dependency array that triggers timeout reset on changes.                   |
+| `asInitialValue` | `boolean`    | `false` | If `true`, starts timeout immediately when hook is initialized.            |
+
+---
+
+## Returned Values
+
+| Name     | Type         | Description                                                                 |
+|----------|--------------|-----------------------------------------------------------------------------|
+| `reset`  | `() => void` | Restarts the timeout with the original delay and callback.                 |
+| `clear`  | `() => void` | Cancels the active timeout, preventing callback execution.                |
+
+---
+
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+
+```tsx
+"use client"
+import useTimeout from '@/hooks/useTimeout';
+import React, { useState } from 'react'
+
+type Props = {}
+
+function TimeoutExample({}: Props) {
+    const [notification, setNotification] = useState('');
+  
+    const { reset, clear } = useTimeout(
+      () => setNotification('Payment processed!'),
+      5000,
+      [],
+      true // Start timeout immediately
+    );
+  
+    return (
+      <div>
+        <h2>Transaction Status</h2>
+        <p>{notification || 'Waiting for confirmation...'}</p>
+        <button onClick={reset}>Retry Payment</button>
+        <button onClick={clear}>Cancel Notification</button>
+      </div>
+    );
+}
+
+export default TimeoutExample
+```
+</Tab> <Tab value="view"> <TimeoutExample/> </Tab> </Tabs>
+## Full Hook Code
+```tsx
+import { useCallback, useEffect, useRef } from "react";
+
+export default function useTimeout(
+  callback: () => void,
+  delay: number,
+  depancey: any[],
+  asInitialValue = false
+) {
+  const callbackRef = useRef(callback);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  const set = useCallback(() => {
+    timeoutRef.current = setTimeout(() => {
+      callbackRef.current();
+    }, delay);
+  }, [delay]);
+
+  const clear = useCallback(() => {
+    timeoutRef.current && clearTimeout(timeoutRef.current);
+  }, []);
+
+  useEffect(() => {
+    asInitialValue && set();
+    return clear;
+  }, [delay, set, clear, ...depancey]);
+
+  const reset = useCallback(() => {
+    clear();
+    set();
+  }, [clear, set]);
+
+  return { reset, clear };
+}
+```

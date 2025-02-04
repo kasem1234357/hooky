@@ -13,14 +13,17 @@
 - [x] useMultiSelect
 - [x] useGeolocation
 - [x] useUpload
-
+- [x] useDebounce
+- [x] useTimeout
+- [x] useSequentialFunctions
+  
 ---
 
 ## in progress
 
-- [ ] useDebounce (testing)
-- [ ] useTimeout (testing)
 - [ ] useValidate (improvement)
+- [ ] useSort (testing and documentation)
+- [ ] usePrint
 
 ---
 
@@ -38,11 +41,10 @@
 
 - [ ] useTable
 - [ ] useSearch
-- [ ] useSort
 
 ## Need to be fixed
 
-- [ ] usePrint
+x
 
 ## in Feature
 

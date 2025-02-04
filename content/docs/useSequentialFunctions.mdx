@@ -1,0 +1,134 @@
+---
+title: useSequentialFunctions
+description: Custom React Hook for managing sequential functions.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+
+import SequentialFunctionsExample from '@/examples/SequentialFunctionsExample';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Sequential Functions**: Manage sequential functions with ease.
+- **Customization**: Customize the behavior based on your requirements.
+- **Simple Integration**: Seamlessly integrate into any React functional component.
+
+---
+## Exported Functions and values
+The hook exports the following:
+
+- `autoStart`
+- `start `
+- `cancel`
+
+---
+## Types
+```tsx
+export interface FunctionWithDelay {
+  /** الدالة التي سيتم تنفيذها */
+  callback: () => void;
+  /** التأخير (بوحدة المللي ثانية) قبل تشغيل هذه الدالة */
+  delay: number;
+}
+
+// الخيارات الإضافية التي يمكن تمريرها إلى الخطاف.
+export interface SequentialFunctionsOptions {
+  /** إذا كانت true، يبدأ تشغيل السلسلة تلقائيًا عند التركيب */
+  autoStart?: boolean;
+  /** دالة تُستدعى عند الانتهاء من تشغيل جميع الدوال */
+  onComplete?: () => void;
+  /** دالة لمعالجة الأخطاء في حالة رمي إحدى الدوال لخطأ */
+  onError?: (error: unknown) => void;
+}
+```
+## Parameters
+
+| Name             | Type         | Default | Description                                                                 |
+|------------------|--------------|---------|-----------------------------------------------------------------------------|
+| `functions`       | `FunctionWithDelay[]` | —       | Array of functions to be executed sequentially.|
+| `options?`          | `SequentialFunctionsOptions`     | —       | Optional configuration object for customizing the behavior of the hook.|
+
+---
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+
+```tsx
+'use client'
+import React, { useState } from "react";
+import useSequentialFunctions, { FunctionWithDelay } from '@/hooks/useSequentialFunctions';
+
+function SequentialFunctionsExample() {
+  const [log, setLog] = useState<string[]>([]);
+
+  // دوال مع تأخيرات مختلفة
+  const functions: FunctionWithDelay[] = [
+    {
+      callback: () => {
+        setLog((prev) => [...prev, "تم تشغيل الدالة 1"]);
+        console.log("تم تشغيل الدالة 1");
+      },
+      delay: 1000, // تأخير 1 ثانية قبل الدالة 1 (يُستخدم لتشغيل الدالة التالية)
+    },
+    {
+      callback: () => {
+        setLog((prev) => [...prev, "تم تشغيل الدالة 2"]);
+        console.log("تم تشغيل الدالة 2");
+      },
+      delay: 2000, // تأخير 2 ثانية قبل الدالة 2
+    },
+    {
+      callback: () => {
+        setLog((prev) => [...prev, "تم تشغيل الدالة 3"]);
+        console.log("تم تشغيل الدالة 3");
+      },
+      delay: 1500, // تأخير 1.5 ثانية قبل الدالة 3
+    },
+  ];
+
+  // استخدام الخطاف مع الخيارات المناسبة.
+  const { start, cancel, isRunning } = useSequentialFunctions(functions, {
+    autoStart: false, // سنبدأ التشغيل يدويًا
+    onComplete: () => {
+      setLog((prev) => [...prev, "انتهت السلسلة"]);
+      console.log("انتهت السلسلة");
+    },
+    onError: (error) => {
+      setLog((prev) => [...prev, `حدث خطأ: ${error}`]);
+      console.error("حدث خطأ:", error);
+    },
+  });
+
+  return (
+    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+      <h2>مثال على تشغيل دوال متتالية مع تأخيرات</h2>
+      <p>
+        <strong>حالة التشغيل:</strong> {isRunning ? "قيد التشغيل" : "متوقف"}
+      </p>
+      <div style={{ marginTop: "10px" }}>
+        <button onClick={start} style={{ marginRight: "10px" }}>
+          بدء السلسلة
+        </button>
+        <button onClick={cancel}>إلغاء السلسلة</button>
+      </div>
+      <div style={{ marginTop: "20px" }}>
+        <h3>السجل:</h3>
+        <ul>
+          {log.map((entry, index) => (
+            <li key={index}>{entry}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+export default SequentialFunctionsExample;
+```
+ </Tab>
+ <Tab value='view'>
+  <SequentialFunctionsExample/>
+ </Tab>
+ </Tabs>

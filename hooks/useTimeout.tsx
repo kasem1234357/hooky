@@ -4,7 +4,8 @@ export default function useTimeout(
   callback: () => void,
   delay: number,
   depancey: any[],
-  asInitialValue= false
+  asInitialValue= false,
+  resetCallback?:() => void
 ) {
   const callbackRef = useRef(callback);
   const timeoutRef = useRef(null);
@@ -38,6 +39,7 @@ export default function useTimeout(
     console.log("from reset");
     clear();
     set();
+    resetCallback && resetCallback()
   }, [clear, set]);
 
   return { reset, clear };
