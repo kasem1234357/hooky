@@ -4,6 +4,9 @@ const useSort =()=>{
     const ascendingSort =(data:(string|number)[])=>{
         return data.slice(0,data.length).sort((a,b)=>a>b?1:-1)
     }
+    const descendingSort =(data:(string|number)[])=>{
+        return data.slice(0,data.length).sort((a,b)=>a<b?1:-1)
+    }
     const objectAscendingSort =(data:Object[],sortMethod:string[])=>{
         const sortImplement =(a:any,b:any,sortMethod:string[],current:number,type:types)=>{
             // console.log(type);
@@ -72,6 +75,7 @@ const useSort =()=>{
     }
     return{
         ascendingSort,
+        descendingSort,
         objectAscendingSort,
         objectDescendingSort
     }

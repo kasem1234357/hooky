@@ -1,0 +1,205 @@
+---
+title: useSort
+description: Custom React Hook for Sorting data
+---
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import SortExample from '@/examples/SortExample';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+
+## Exported Functions and values
+The hook exports the following:
+
+- `ascendingSort`
+- `objectAscendingSort`
+- `objectDescendingSort`
+
+---
+
+---
+
+## Returned Values
+
+| Name     | Type         | Description                                                                 |
+|----------|--------------|-----------------------------------------------------------------------------|
+| `ascendingSort`  | `(data:(string`\|`number)[]) => sorted data` | return sorted data in ascending way                 |
+| `descendingSort`  | `(data:(string`\|`number)[]) => sorted data` | return sorted data in descending way                 |
+| `objectAscendingSort`  | `(data:Object[],sortMethod:string[]) => sorted objects data` | return sorted objects data in ascending way                 |
+| `objectDescendingSort`  | `(data:Object[],sortMethod:string[]) => sorted objects data` | return sorted objects data in descending way                 |
+---
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+
+```tsx
+'use client'
+import useSort from "@/hooks/useSort";
+import React, { useState } from "react";
+
+type Props = {};
+const data = ["nour", "laith", "mustafa", "kasem", "ahmad"];
+const objectData = [
+  {
+    name: "test",
+    price: 90,
+    desc: "test description",
+  },
+  {
+    name: "test",
+    price: 100,
+    desc: "test description",
+  },
+  {
+    name: "lolo",
+    price: 90,
+    desc: "test description",
+  },
+  {
+    name: "final",
+    price: 120,
+    desc: "test description",
+  },
+];
+function SortExample({}: Props) {
+    const [result,setRersult] = useState<any>()
+  const {
+    ascendingSort,
+    descendingSort,
+    objectAscendingSort,
+    objectDescendingSort,
+  } = useSort();
+  return (
+    <div>
+      <h2>SortExample</h2>
+      <div className="original">
+        <h3>simple data</h3>
+      <div className="text-wrap bg-neutral-800 my-2 p-2">
+         
+         {JSON.stringify(data)}
+        </div>
+        <h3>object data</h3>
+        <div className="text-wrap bg-neutral-800 my-2 p-2">
+         
+         {JSON.stringify(objectData)}
+        </div>
+      </div>
+      <div className="btns flex gap-2">
+        <button className="px-4 py-2 rounded-md bg-blue-600" onClick={()=>{
+            setRersult(ascendingSort(data))
+        }}>ascending Sort</button>
+        <button className="px-4 py-2 rounded-md bg-red-600" onClick={()=>{
+            setRersult(descendingSort(data))
+        }}>descending Sort</button>
+        <button className="px-4 py-2 rounded-md bg-blue-600" onClick={()=>{
+             setRersult(objectAscendingSort(objectData,['name','price']))
+        }}>object Ascending Sort</button>
+        <button className="px-4 py-2 rounded-md bg-red-600" onClick={()=>{
+             setRersult(objectDescendingSort(objectData,['name','price']))
+        }}>object Descending Sort</button>
+      </div>
+      <div className="text-wrap bg-neutral-800 my-2 p-2">
+         
+              {JSON.stringify(result)}
+             </div>
+    </div>
+  );
+}
+
+export default SortExample;
+
+```
+</Tab>
+<Tab value = 'view'>
+<SortExample/>
+</Tab>
+</Tabs>
+---
+## Full Hook Code
+```tsx
+type types = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function"
+const useSort =()=>{
+    
+    const ascendingSort =(data:(string|number)[])=>{
+        return data.slice(0,data.length).sort((a,b)=>a>b?1:-1)
+    }
+    const descendingSort =(data:(string|number)[])=>{
+        return data.slice(0,data.length).sort((a,b)=>a<b?1:-1)
+    }
+    const objectAscendingSort =(data:Object[],sortMethod:string[])=>{
+        const sortImplement =(a:any,b:any,sortMethod:string[],current:number,type:types)=>{
+            // console.log(type);
+            
+            const compare= (type:any)=>{
+                if (type == 'string'){
+                    return a[sortMethod[current]] >= b[sortMethod[current]]?1:-1
+                }
+                else{
+                    return a[sortMethod[current]] <= b[sortMethod[current]]?1:-1 
+                }
+            }
+            if(current >0){
+                if(a[sortMethod[current-1]] == b[sortMethod[current-1]]){
+                    // return a[sortMethod[current]] >= b[sortMethod[current]]?1:-1
+                     return compare(type)
+                    
+                }else {return 0}
+                
+            }
+            // return a[sortMethod[current]] >= b[sortMethod[current]]?1:-1
+             return compare(type)
+        }
+        const sortFn:any=(data:any,current:number)=>{
+            if(current === sortMethod.length) return data
+            const t = data[0][sortMethod[current]]
+            // console.log(t);
+            
+            const newData = data.sort((a:any,b:any)=>sortImplement(a,b,sortMethod,current,typeof(t)))
+            return sortFn(newData,current+1)
+        }
+        return sortFn(data.slice(0,data.length),0)
+     }
+    const objectDescendingSort =(data:Object[],sortMethod:string[])=>{
+        const sortImplement =(a:any,b:any,sortMethod:string[],current:number,type:types)=>{
+            // console.log(type);
+            
+            const compare= (type:any)=>{
+                if (type == 'string'){
+                    return a[sortMethod[current]] >= b[sortMethod[current]]?-1:1
+                }
+                else{
+                    return a[sortMethod[current]] <= b[sortMethod[current]]?-1:1 
+                }
+            }
+            if(current >0){
+                if(a[sortMethod[current-1]] == b[sortMethod[current-1]]){
+                    // return a[sortMethod[current]] >= b[sortMethod[current]]?1:-1
+                     return compare(type)
+                    
+                }else {return 0}
+                
+            }
+            // return a[sortMethod[current]] >= b[sortMethod[current]]?1:-1
+             return compare(type)
+        }
+        const sortFn:any=(data:any,current:number)=>{
+            if(current === sortMethod.length) return data
+            const t = data[0][sortMethod[current]]
+            // console.log(t);
+            
+            const newData = data.sort((a:any,b:any)=>sortImplement(a,b,sortMethod,current,typeof(t)))
+            return sortFn(newData,current+1)
+        }
+        return sortFn(data.slice(0,data.length),0)
+    }
+    return{
+        ascendingSort,
+        descendingSort,
+        objectAscendingSort,
+        objectDescendingSort
+    }
+}
+
+export default useSort
+```

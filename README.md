@@ -16,13 +16,14 @@
 - [x] useDebounce
 - [x] useTimeout
 - [x] useSequentialFunctions
+- [x] useSort
   
 ---
 
 ## in progress
 
 - [ ] useValidate (improvement)
-- [ ] useSort (testing and documentation)
+- [ ] useTable
 - [ ] usePrint
 
 ---
@@ -39,7 +40,6 @@
 
 ## Need to be tested
 
-- [ ] useTable
 - [ ] useSearch
 
 ## Need to be fixed
