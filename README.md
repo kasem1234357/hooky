@@ -18,14 +18,16 @@
 - [x] useSequentialFunctions
 - [x] useSort
 - [x] useValidate
+- [x] useTable
   
 ---
 
 ## in progress
 
-- [ ] useTable
 - [ ] usePrint (typing and documentation)
-
+- [ ] useHistory
+- [ ] useSearch
+  
 ---
 
 ## Need documentation
@@ -34,13 +36,13 @@
 
 ## Need improvement
 
-- [ ] useHistory
+x
 
 ---
 
 ## Need to be tested
 
-- [ ] useSearch
+x
 
 ## Need to be fixed
 

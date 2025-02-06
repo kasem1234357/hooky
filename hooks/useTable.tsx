@@ -43,7 +43,7 @@ const useTable = (steps:number) => {
     timer = setTimeout(()=> {
       callback();
       clearTimeout(timer);
-    }, time);
+    }, time?time:500);
   }
 
   return {

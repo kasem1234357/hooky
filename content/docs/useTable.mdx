@@ -1,0 +1,239 @@
+---
+title: useTable
+description: Custom React Hook for managing table state with pagination, sorting, and search functionality
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Pagination Control**: Next/previous step navigation
+- **Sorting Management**: Column ordering with asc/desc modes
+- **Search Handling**: Debounced search implementation
+- **Records Management**: Control visible records count
+- **Pagination Calculation**: Automatic skip length calculation
+
+---
+Usage Notes
+Pagination: Use skipsLength() for calculating API skip parameter
+
+Debounced Search: handleSearch prevents excessive API calls during typing
+
+Sorting: Combine orderBy and orderMode for server-side sorting
+
+Type Safety: All state values are properly typed for TypeScript usage
+
+Responsive Controls: Update multiple parameters while maintaining current step
+
+Reset State: Remember to reset currentStep when search parameters change
+---
+
+## Parameters
+
+| Name | Type | Description |
+|------|------|-------------|
+| `steps` | `number` | Total number of pages/steps available |
+
+---
+
+## Returned Values
+
+### State Management
+| Name | Type | Description |
+|------|------|-------------|
+| `currentStep` | `number` | Current page/step index (0-based) |
+| `orderBy` | `string` | Column to order results by |
+| `searchIn` | `string` | Column to search within |
+| `searchQuery` | `string` | Current search term |
+| `orderMode` | `string` | Sorting direction (`asc` or `desc`) |
+| `recordsLength` | `number` | Number of records per page |
+
+### State Setters
+| Name | Type | Description |
+|------|------|-------------|
+| `setCurrentStep` | `(value: number) => void` | Update current step |
+| `setOrderBy` | `(column: string) => void` | Set ordering column |
+| `setSearchIn` | `(column: string) => void` | Set search column |
+| `setSearchQuery` | `(term: string) => void` | Update search term |
+| `setOrderMode` | `(mode: string) => void` | Set sorting direction |
+| `setRecordsLength` | `(length: number) => void` | Change records per page |
+
+### Methods
+| Name | Type | Description |
+|------|------|-------------|
+| `toNext` | `() => void` | Move to next page/step |
+| `toBack` | `() => void` | Return to previous page/step |
+| `skipsLength` | `() => number` | Calculate skip records for pagination |
+| `handleSearch` | `(time: number, callback: () => void) => void` | Debounced search handler |
+
+---
+
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+
+```tsx
+"use client"
+import useTable from '@/hooks/useTable';
+import React, { useEffect, useState } from 'react';
+
+const DataTable = () => {
+  const [data, setData] = useState<any[]>([]);
+  const totalSteps = 5; // Total pages from API
+  
+  const {
+    currentStep,
+    orderBy,
+    searchQuery,
+    orderMode,
+    recordsLength,
+    toNext,
+    toBack,
+    skipsLength,
+    handleSearch,
+    setOrderBy,
+    setOrderMode,
+    setSearchIn,
+    setRecordsLength
+  } = useTable(totalSteps);
+
+  // Mock API call
+  const fetchData = async () => {
+    const response = await fetch(
+      `/api/data?skip=${skipsLength()}&limit=${recordsLength}&orderBy=${orderBy}&orderMode=${orderMode}&search=${searchQuery}`
+    );
+    setData(await response.json());
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [currentStep, orderBy, orderMode, recordsLength, searchQuery]);
+
+  return (
+    <div>
+      <div className="controls">
+        <input
+          type="text"
+          placeholder="Search..."
+          onChange={(e) => {
+            setSearchIn('name'); // Search in 'name' column
+            handleSearch(500, fetchData);
+          }}
+        />
+        
+        <select onChange={(e) => setRecordsLength(Number(e.target.value))}>
+          <option value={10}>10 records</option>
+          <option value={25}>25 records</option>
+          <option value={50}>50 records</option>
+        </select>
+
+        <div className="pagination">
+          <button onClick={toBack} disabled={currentStep === 0}>
+            Previous
+          </button>
+          <span>Page {currentStep + 1} of {totalSteps}</span>
+          <button onClick={toNext} disabled={currentStep === totalSteps - 1}>
+            Next
+          </button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th onClick={() => {
+              setOrderBy('name');
+              setOrderMode(prev => prev === 'asc' ? 'desc' : 'asc');
+            }}>
+              Name {orderBy === 'name' && `(${orderMode})`}
+            </th>
+            {/* Add more columns */}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map(item => (
+            <tr key={item.id}>
+              <td>{item.name}</td>
+              {/* Render other data */}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+```
+</Tab> <Tab value="view"> {/* Component preview would be implemented here */} </Tab> </Tabs>
+## Full Hook Code
+```tsx
+// Dependencies
+import { useState } from "react";
+
+const useTable = (steps:number) => {
+  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [orderBy, setOrderBy] = useState<string>("id");
+  const [searchIn, setSearchIn] = useState<string>('id');
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [orderMode, setOrderMode] = useState<string>("desc");
+  const [recordsLength, setRecordsLength] = useState<number>(10);
+
+  /**
+   * @desc This function using to move one step.
+   * @return { void }
+   */
+  const toNext = (): void => {
+    currentStep + 1 < steps && setCurrentStep((prev:number) => prev + 1);
+  }
+
+  /**
+   * @desc This function using to back one step.
+   * @return { void }
+   */
+  const toBack = (): void => {
+    currentStep > 0 && setCurrentStep((prev:number) => prev - 1);
+  }
+
+  /**
+   * @desc This function using to get how many skips you want.
+   * @return { number }
+   */
+  const skipsLength = (): number => Math.ceil(recordsLength * currentStep);
+
+  /**
+   * @desc This function using to handle search time to send a request to database.
+   * @param { number } time
+   * @return { void }
+   */
+  const handleSearch = (time:number, callback:()=> void): void=>{
+    let timer:number|undefined;
+    clearInterval(timer);
+    //@ts-ignore
+    timer = setTimeout(()=> {
+      callback();
+      clearTimeout(timer);
+    }, time?time:500);
+  }
+
+  return {
+    currentStep,
+    setCurrentStep,
+    orderBy,
+    setOrderBy,
+    searchIn,
+    setSearchIn,
+    searchQuery,
+    setSearchQuery,
+    orderMode,
+    setOrderMode,
+    recordsLength,
+    setRecordsLength,
+    toNext,
+    toBack,
+    skipsLength,
+    handleSearch
+  }
+}
+
+export default useTable;
+```
