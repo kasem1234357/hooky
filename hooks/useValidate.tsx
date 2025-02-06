@@ -1,44 +1,103 @@
-import { useState } from "react"
+import { useState, useMemo } from "react";
 
-const useValidate = ()=>{
-    const [regex,setRegex] = useState<Object>({
-        userName:"^[A-Za-z0-9]{3,16}$",
-        email:"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
-        password:`^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$`,
-    })
-    const [validate,setValidate] =useState<boolean | null>(null)
-    const [errorMassege,setErrorMassege] =useState<Object>({
-        userName:"Username should be 3-16 characters and shouldn't include any special character!",
-        email:"It should be a valid email address!",
-        password:"Password should be 8-20 characters and include at least 1 letter, 1 number and 1 special character!",
-    })
-    const isValidate =(data:string,type:string):boolean =>{
-        //@ts-ignore
-        const result = new RegExp(regex[type as keyof typeof regex]).test(data)
-        setValidate(result)
-        return result
-    }
-    const updateErrorMassege =(msg:Object)=>{
-       Object.keys(msg).length?setErrorMassege(prev =>({...prev,...msg})):console.error("you cant send empty object") 
-        
-    }
-    const onSuccess = (callback:Function)=>{validate !== null && validate && callback()}
-    const onError = (callback:Function)=>{validate !== null && !validate && callback()}
-    const getValidateRegex = (type:string)=>{
-        return (regex[type as keyof typeof regex] ?? '')
-    }
-    const setValidateRegex = (data:{})=>{
-        Object.keys(data).length?setRegex(prev => ({...prev,...data})):console.error("you cant send empty object") 
-    }
-    return{
-        isValidate,
-        errorMassege,
-        updateErrorMassege,
-        onError,
-        onSuccess,
-        getValidateRegex,
-        setValidateRegex,
-        regex
-    }
+type ValidationType = 'userName' | 'email' | 'password' | 'custom';
+type ValidationRules = Record<string, RegExp>;
+type ErrorMessages = Record<string, string>;
+
+interface ValidationConfig {
+  rules?: ValidationRules;
+  messages?: ErrorMessages;
+  onSuccess?: () => void;
+  onError?: () => void;
 }
-export default useValidate
+
+interface ValidationResult {
+  isValid: boolean;
+  error?: string;
+}
+
+const DEFAULT_RULES: ValidationRules = {
+  userName: /^[A-Za-z0-9]{3,16}$/,
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  password: /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&*]).{8,20}$/,
+};
+
+const DEFAULT_MESSAGES: ErrorMessages = {
+  userName: "Username should be 3-16 alphanumeric characters",
+  email: "Please enter a valid email address",
+  password: "Password must be 8-20 characters with at least 1 letter, 1 number, and 1 special character",
+};
+
+const useValidate = (config?: ValidationConfig) => {
+  const [customRules, setCustomRules] = useState<ValidationRules>(config?.rules || {});
+  const [customMessages, setCustomMessages] = useState<ErrorMessages>(config?.messages || {});
+  
+  const mergedRules = useMemo(() => ({
+    ...DEFAULT_RULES,
+    ...customRules
+  }), [customRules]);
+
+  const mergedMessages = useMemo(() => ({
+    ...DEFAULT_MESSAGES,
+    ...customMessages
+  }), [customMessages]);
+
+  const validate = (type: ValidationType | string, value: string): ValidationResult => {
+    const regex = mergedRules[type];
+    
+    if (!regex) {
+      return {
+        isValid: false,
+        error: `No validation rule found for type: ${type}`
+      };
+    }
+
+    const isValid = regex.test(value);
+    return {
+      isValid,
+      error: isValid ? undefined : mergedMessages[type] || `Invalid ${type}`
+    };
+  };
+  const bulkValidate = (fields: Record<string, string>) => {
+    let allValid = true;
+    const validationResult = Object.entries(fields).reduce((acc, [fieldName, value]) => {
+      const result = validate(fieldName, value);
+      if (!result.isValid) {
+     allValid = false;
+      }
+      return {
+        ...acc,
+        [fieldName]: result
+      };
+    }, {} as Record<string, ValidationResult>);
+    allValid ? config?.onSuccess?.() : config?.onError?.();
+    return validationResult;
+  };
+
+  const updateRules = (newRules: ValidationRules) => {
+    if (Object.keys(newRules).length === 0) {
+      console.warn("updateRules requires a non-empty object");
+      return;
+    }
+    setCustomRules(prev => ({ ...prev, ...newRules }));
+  };
+
+  const updateMessages = (newMessages: ErrorMessages) => {
+    if (Object.keys(newMessages).length === 0) {
+      console.warn("updateMessages requires a non-empty object");
+      return;
+    }
+    setCustomMessages(prev => ({ ...prev, ...newMessages }));
+  };
+
+  return {
+    validate,
+    bulkValidate,
+    updateRules,
+    updateMessages,
+    getCurrentRules: () => mergedRules,
+    getCurrentMessages: () => mergedMessages,
+  };
+};
+
+export default useValidate;

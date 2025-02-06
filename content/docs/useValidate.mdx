@@ -1,0 +1,154 @@
+---
+title: useValidate
+description: Custom React Hook for form validation with regex patterns, supporting custom rules and bulk validation.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import SingleValidationExample from '@/examples/SingleValidationExample';
+import BulkValidationExample from '@/examples/BulkValidationExample';
+
+## Features
+- **Predefined Validations**: Built-in rules for username, email, and password
+- **Custom Rules**: Add custom regex validation patterns
+- **Custom Messages**: Define custom error messages
+- **Bulk Validation**: Validate multiple fields at once
+- **Dynamic Updates**: Modify rules and messages during runtime
+- **Callback Support**: Success/error handlers for validation results
+- **Custom Validation**: Types: Extend validation by adding new keys to the rules/messages objects
+- **Dynamic Updates**: Use updateRules/updateMessages to modify validation behavior at runtime
+- **Bulk Validation**: Returns detailed results while maintaining overall validity status
+- **Error Handling**: Always check isValid before proceeding with form submissions
+- **Performance**: Memoized rules/messages ensure efficient re-renders
+---
+
+## Parameters
+
+### ValidationConfig Object
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `rules` | `ValidationRules` | DEFAULT_RULES | Custom validation regex patterns |
+| `messages` | `ErrorMessages` | DEFAULT_MESSAGES | Custom error messages |
+| `onSuccess` | `() => void` | - | Callback for successful validation |
+| `onError` | `() => void` | - | Callback for failed validation |
+
+---
+
+## Returned Methods
+
+| Method | Type | Description |
+|--------|------|-------------|
+| `validate` | `(type: ValidationType \| string, value: string) => ValidationResult` | Validates a single field |
+| `bulkValidate` | `(fields: Record<string, string>) => Record<string, ValidationResult>` | Validates multiple fields |
+| `updateRules` | `(newRules: ValidationRules) => void` | Updates validation rules |
+| `updateMessages` | `(newMessages: ErrorMessages) => void` | Updates error messages |
+| `getCurrentRules` | `() => ValidationRules` | Returns merged rules |
+| `getCurrentMessages` | `() => ErrorMessages` | Returns merged messages |
+
+---
+## Default Validation Rules
+|Field	| Regex Pattern |Default Message |
+|-------|---------------|----------------|
+|userName	|/^[A-Za-z0-9]{3,16}$/	|Username should be 3-16 alphanumeric characters|
+|email	|/^[^\s@]+@[^\s@]+\.[^\s@]+$/	|Please enter a valid email address|
+|password	|/^(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&*]).{8,20}$/	|Password must be 8-20 characters with at least 1 letter, 1 number, and 1 special character|
+## Example Usage
+
+<Tabs items={['single-validation', 'bulk-validation']}>
+  <Tab value="single-validation">
+    <Tabs items={['code', 'view']}>
+    <Tab value="code">
+    ```tsx
+"use client"
+import useValidate from '@/hooks/useValidate';
+import React, { useState } from 'react';
+
+function SingleValidationExample() {
+  const [username, setUsername] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  
+  const { validate } = useValidate({
+    onSuccess: () => console.log('Valid input!'),
+    onError: () => console.log('Invalid input!')
+  });
+
+  const handleValidation = (value: string) => {
+    const { isValid, error } = validate('userName', value);
+    setError(error || null);
+    return isValid;
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={username}
+        onChange={(e) => {
+          setUsername(e.target.value);
+          handleValidation(e.target.value);
+        }}
+        placeholder="Enter username"
+      />
+      {error && <div className="error">{error}</div>}
+    </div>
+  );
+}
+```
+    </Tab>
+    <Tab value="view">
+    <SingleValidationExample />
+    </Tab>
+    </Tabs>
+
+</Tab> 
+<Tab value="bulk-validation">
+<Tabs items={['code', 'view']}>
+<Tab value="code">
+
+```tsx
+"use client"
+import useValidate from '@/hooks/useValidate';
+import React, { useState } from 'react';
+
+function BulkValidationExample() {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  
+  const { bulkValidate } = useValidate({
+    onSuccess: () => alert('All fields valid!'),
+    onError: () => alert('Validation errors!')
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const results = bulkValidate(formData);
+    console.log('Validation results:', results);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={formData.email}
+        onChange={(e) => setFormData({...formData, email: e.target.value})}
+      />
+      <input
+        type="password"
+        value={formData.password}
+        onChange={(e) => setFormData({...formData, password: e.target.value})}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+</Tab>
+<Tab value="view">
+<BulkValidationExample />
+</Tab>
+</Tabs>
+</Tab>
+ </Tabs>

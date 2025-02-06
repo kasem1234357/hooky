@@ -17,14 +17,14 @@
 - [x] useTimeout
 - [x] useSequentialFunctions
 - [x] useSort
+- [x] useValidate
   
 ---
 
 ## in progress
 
-- [ ] useValidate (improvement)
 - [ ] useTable
-- [ ] usePrint
+- [ ] usePrint (typing and documentation)
 
 ---
 
