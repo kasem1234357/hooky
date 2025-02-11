@@ -25,8 +25,6 @@
 ## in progress
 
 - [ ] usePrint (typing and documentation)
-- [ ] useHistory
-- [ ] useSearch
   
 ---
 
@@ -48,9 +46,12 @@ x
 
 x
 
-## in Feature
+## start building
 
 - [ ] useScroll
+
+## in Feature
+
 - [ ] usePagination
 - [ ] useAuth
 - [ ] useToast

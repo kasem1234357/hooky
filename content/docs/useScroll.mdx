@@ -1,0 +1,170 @@
+---
+title: useScroll
+description: Custom React Hook for tracking scroll position, detecting scroll direction, and handling scroll events efficiently.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import ScrollExample from '@/examples/ScrollExample';
+
+## Features
+- **Scroll Tracking**: Get real-time scroll position (`scrollX`, `scrollY`).
+- **Direction Detection**: Detect whether the user is scrolling up or down.
+- **Scroll End Handling**: Trigger a callback when the bottom is reached.
+- **Scroll Start/End Events**: Callbacks for when scrolling starts and stops.
+- **Throttle Support**: Improve performance with customizable delay.
+- **Custom Tracking Element**: Monitor scrolling on a specific element instead of the window.
+
+---
+
+## Parameters
+
+### UseScrollOptions Object
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `onEndReached` | `() => void` | - | Callback triggered when scrolling reaches the bottom threshold. |
+| `onScrollStart` | `() => void` | - | Callback triggered when scrolling starts. |
+| `onScrollEnd` | `() => void` | - | Callback triggered when scrolling stops. |
+| `threshold` | `number` | `0.9` | Percentage of scroll completion to trigger `onEndReached`. |
+| `trackElement` | `React.RefObject<HTMLElement>` | `window` | Element to track scrolling on instead of the window. |
+| `throttleDelay` | `number` | `100` | Delay in milliseconds for throttling scroll events. |
+
+---
+
+## Returned Values
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `scrollX` | `number` | Horizontal scroll position. |
+| `scrollY` | `number` | Vertical scroll position. |
+| `scrollingUp` | `boolean` | `true` if scrolling upwards. |
+| `scrollingDown` | `boolean` | `true` if scrolling downwards. |
+| `scrollPercentage` | `number` | Percentage of page scrolled. |
+| `isAtBottom` | `boolean` | `true` if scrolled to the bottom. |
+| `isAtTop` | `boolean` | `true` if at the top of the page. |
+| `isScrolling` | `boolean` | `true` when scrolling is active. |
+
+---
+
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+<Tab value="code">
+
+```tsx
+"use client"
+import { useScroll } from '@/hooks/useScroll';
+import React from 'react';
+
+function ScrollExample() {
+  const { scrollY, isAtBottom, scrollingUp } = useScroll({
+    onEndReached: () => console.log('Reached bottom!'),
+  });
+
+  return (
+    <div>
+      <p>Current Scroll Y: {scrollY}</p>
+      {isAtBottom && <p>You've reached the bottom!</p>}
+      {scrollingUp && <p>Scrolling Up!</p>}
+    </div>
+  );
+}
+```
+</Tab>
+<Tab value="view">
+  <ScrollExample />
+</Tab>
+</Tabs>
+
+---
+
+{/* ## Full Hook Code
+
+```tsx
+import { useState, useEffect, useRef } from "react";
+
+interface UseScrollOptions {
+  onEndReached?: () => void;
+  onScrollStart?: () => void;
+  onScrollEnd?: () => void;
+  threshold?: number;
+  trackElement?: React.RefObject<HTMLElement>;
+  throttleDelay?: number;
+}
+
+interface ScrollState {
+  scrollX: number;
+  scrollY: number;
+  scrollingUp: boolean;
+  scrollingDown: boolean;
+  scrollPercentage: number;
+  isAtBottom: boolean;
+  isAtTop: boolean;
+  isScrolling: boolean;
+}
+
+export function useScroll({
+  onEndReached,
+  onScrollStart,
+  onScrollEnd,
+  threshold = 0.9,
+  trackElement,
+  throttleDelay = 100,
+}: UseScrollOptions = {}): ScrollState {
+  const [state, setState] = useState<ScrollState>({
+    scrollX: 0,
+    scrollY: 0,
+    scrollingUp: false,
+    scrollingDown: false,
+    scrollPercentage: 0,
+    isAtBottom: false,
+    isAtTop: true,
+    isScrolling: false,
+  });
+  
+  const lastScrollY = useRef(0);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const element = trackElement?.current || window;
+
+    const handleScroll = () => {
+      const scrollY = trackElement?.current?.scrollTop || window.scrollY;
+      const scrollX = trackElement?.current?.scrollLeft || window.scrollX;
+      const maxScroll = (trackElement?.current?.scrollHeight || document.body.scrollHeight) - window.innerHeight;
+      const scrollPercentage = maxScroll > 0 ? scrollY / maxScroll : 0;
+      const isAtBottom = scrollPercentage >= threshold;
+      const isAtTop = scrollY === 0;
+      const scrollingUp = scrollY < lastScrollY.current;
+      const scrollingDown = scrollY > lastScrollY.current;
+
+      setState({
+        scrollX,
+        scrollY,
+        scrollingUp,
+        scrollingDown,
+        scrollPercentage,
+        isAtBottom,
+        isAtTop,
+        isScrolling: true,
+      });
+
+      if (isAtBottom && onEndReached) onEndReached();
+      if (!scrollTimeout.current) onScrollStart?.();
+      
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      scrollTimeout.current = setTimeout(() => {
+        setState(prev => ({ ...prev, isScrolling: false }));
+        onScrollEnd?.();
+      }, throttleDelay);
+
+      lastScrollY.current = scrollY;
+    };
+
+    element.addEventListener("scroll", handleScroll, { passive: true });
+    return () => element.removeEventListener("scroll", handleScroll);
+  }, [trackElement, threshold, onEndReached, onScrollStart, onScrollEnd, throttleDelay]);
+
+  return state;
+} */}

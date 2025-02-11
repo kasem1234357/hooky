@@ -1,0 +1,168 @@
+---
+title: usePrint
+description: React hook for generating PDF prints with customizable layouts and styles
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import PrintExample from '@/examples/PrintExample';
+import PrintExample2 from '@/examples/PrintExample2';
+
+## Features
+- **Partial/Full Window Printing**: Print specific elements or entire page
+- **Style Preservation**: Copy original document styles or filter specific ones
+- **Custom Margins**: Configure page margins for PDF output
+- **Lifecycle Hooks**: Callbacks for pre/post print operations
+- **Popup Handling**: Automatic window cleanup and error handling
+- **Cross-Browser Support**: Works with modern browsers' print systems
+
+---
+
+## Parameters
+
+### convertToPDF Arguments
+1. **contentRef**: `RefObject<HTMLElement>`  
+   Reference to printable content element
+
+2. **options**: `PrintOptions` (optional)
+   ```ts
+   {
+     documentTitle?: string,       // PDF document title
+     removeAfterPrint?: boolean,   // Auto-close print window (default: true)
+     fullWindow?: boolean,         // Print entire window instead of element
+     onBeforePrint?: () => void,   // Pre-print callback
+     onAfterPrint?: () => void,    // Post-print callback
+     copyStyles?: boolean,         // Copy parent styles (default: true)
+     targetStyles?: string[],      // Specific stylesheets to include
+     pageMargin?: string,          // CSS margin (default: '20mm')
+     timeout?: number              // Cleanup delay (default: 500ms)
+   }
+   ```
+---
+<Tabs items={['Element Printing', 'Full Window']}>
+<Tab value="Element Printing">
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+```tsx
+"use client"
+import { useRef } from 'react';
+import usePrint from '@/hooks/usePrint';
+
+const PrintExample = () => {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { convertToPDF } = usePrint();
+
+  return (
+    <div>
+      <div ref={contentRef} className="print-section">
+        <h1>Annual Report</h1>
+        <p>Confidential financial data...</p>
+      </div>
+
+      <button
+        onClick={() =>{ 
+            if(!contentRef.current) return;
+            if(contentRef){
+            convertToPDF(contentRef, {
+          documentTitle: 'Financial Report 2023',
+          pageMargin: '15mm',
+          copyStyles: true,
+          onBeforePrint: () => console.log('Generating PDF...'),
+          onAfterPrint: () => console.log('PDF saved')
+        })}
+    
+    }}
+      >
+        Export as PDF
+      </button>
+    </div>
+  );
+};
+export default PrintExample;
+```
+</Tab>
+<Tab value="view">
+<PrintExample/>
+</Tab>
+</Tabs>
+</Tab>
+<Tab value="Full Window">
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+```tsx
+"use client"
+import usePrint from '@/hooks/usePrint';
+import React from 'react'
+
+type Props = {}
+
+function PrintExample2({}: Props) {
+    const { convertToPDF } = usePrint();
+
+    return (
+      <button
+        onClick={() => convertToPDF(null, {
+          fullWindow: true,
+          pageMargin: '10mm',
+          documentTitle: 'Complete Page Export'
+        })}
+      >
+        Print Current Page
+      </button>
+    );
+}
+
+export default PrintExample2
+```
+</Tab>
+<Tab value="view">
+<PrintExample2/>
+</Tab>
+</Tabs>
+</Tab> </Tabs>
+## Best Practices
+
+**Print Styling**: Add print-specific styles  
+```css
+@media print {
+  .print-section {
+    break-inside: avoid;
+    page-break-after: auto;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
+```
+**Error Handling**: Wrap in try/catch
+```tsx
+const handlePrint = async () => {
+  try {
+    await convertToPDF(contentRef, { /* options */ });
+  } catch (error) {
+    console.error('Print failed:', error);
+    // Show error to user
+  }
+};
+```
+Security: Handle popup blockers
+```tsx
+onClick={() => {
+  const printWindow = window.open();
+  if (!printWindow) {
+    alert('Please allow popups for printing');
+  }
+  // Proceed with convertToPDF
+}}
+```
+Technical Notes
+Style Copying: Uses document.styleSheets API to clone styles
+
+Margin Control: Applies through CSS @page rules
+
+Debounced Cleanup: 500ms timeout ensures print completion
+
+DOM Cloning: Creates element copy to prevent layout disruption
+
+Browser Support: Tested with Chrome, Firefox, and Safari
