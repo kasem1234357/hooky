@@ -19,12 +19,14 @@
 - [x] useSort
 - [x] useValidate
 - [x] useTable
-  
+- [x] usePrint
+- [x] useScroll
+
 ---
 
 ## in progress
 
-- [ ] usePrint (typing and documentation)
+x
   
 ---
 
@@ -48,7 +50,7 @@ x
 
 ## start building
 
-- [ ] useScroll
+x
 
 ## in Feature
 
