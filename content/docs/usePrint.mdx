@@ -146,23 +146,4 @@ const handlePrint = async () => {
   }
 };
 ```
-Security: Handle popup blockers
-```tsx
-onClick={() => {
-  const printWindow = window.open();
-  if (!printWindow) {
-    alert('Please allow popups for printing');
-  }
-  // Proceed with convertToPDF
-}}
-```
-Technical Notes
-Style Copying: Uses document.styleSheets API to clone styles
 
-Margin Control: Applies through CSS @page rules
-
-Debounced Cleanup: 500ms timeout ensures print completion
-
-DOM Cloning: Creates element copy to prevent layout disruption
-
-Browser Support: Tested with Chrome, Firefox, and Safari
