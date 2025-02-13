@@ -5,17 +5,23 @@ const useExport =()=>{
   const [importedData,setImportedData]=useState({})
   
   const convertArrayToString = (key:string,item:any,data:any,i:number)=>{
+    
      if(item.hasOwnProperty('length')){
+      
        if(i === 0){
+        
          const state = item.every((el:any) => typeof(el) !=='object')
          if(!state) {
+          
            unvalidKey.push(key)
            return item
          }
          else{
+          
            return item.join(', ')
        }
        }else if(unvalidKey.indexOf(key) === -1){
+        
          return item.join(', ')
        }
       
@@ -27,26 +33,28 @@ const useExport =()=>{
      }
   }
   const  generateExcelFile=(data:any,fileName:string,option:{limitFields?:string[]}={})=>{
-    for(let i=0;i<data.length;i++){
+    const processedData = JSON.parse(JSON.stringify(data));
+
+    for(let i=0;i<processedData.length;i++){
       if(option?.limitFields){
         for(let item of option.limitFields){
-          delete data[i][item]
+          delete processedData[i][item];
         }
       } 
-        for(let dataItem of Object.keys(data[i])){
-            if(typeof data[i][dataItem] === 'object'){
+        for(let dataItem of Object.keys(processedData[i])){
+            if(processedData[i][dataItem] !== null &&typeof processedData[i][dataItem] === 'object'){
 
-              data[i][dataItem] = convertArrayToString(dataItem,data[i][dataItem],data[i],i)
+              processedData[i][dataItem] = convertArrayToString(dataItem,processedData[i][dataItem],processedData[i],i)
             }
-            if(data[i][dataItem] === undefined){
-              delete data[i][dataItem]
+            if(processedData[i][dataItem] === undefined){
+              delete processedData[i][dataItem]
             }
         }
         
 
     }
   
-    const worksheet = utils.json_to_sheet(data);
+    const worksheet = utils.json_to_sheet(processedData);
     console.log(worksheet)
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, "Sheet1");

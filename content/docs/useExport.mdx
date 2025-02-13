@@ -187,21 +187,27 @@ The hook exports the following type definitions:
 import { useState } from "react";
 import {utils,writeFile, readFile,} from "xlsx";
 const useExport =()=>{
-  const unvalidKey =[]
+  const unvalidKey:string[] =[]
   const [importedData,setImportedData]=useState({})
   
-  const convertArrayToString = (key,item,data,i)=>{
+  const convertArrayToString = (key:string,item:any,data:any,i:number)=>{
+    
      if(item.hasOwnProperty('length')){
+      
        if(i === 0){
-         const state = item.every(el => typeof(el) !=='object')
+        
+         const state = item.every((el:any) => typeof(el) !=='object')
          if(!state) {
+          
            unvalidKey.push(key)
            return item
          }
          else{
+          
            return item.join(', ')
        }
        }else if(unvalidKey.indexOf(key) === -1){
+        
          return item.join(', ')
        }
       
@@ -212,33 +218,35 @@ const useExport =()=>{
        delete data[key]
      }
   }
-  const  generateExcelFile=(data,fileName,option={})=>{
-    for(let i=0;i<data.length;i++){
+  const  generateExcelFile=(data:any,fileName:string,option:{limitFields?:string[]}={})=>{
+    const processedData = JSON.parse(JSON.stringify(data));
+
+    for(let i=0;i<processedData.length;i++){
       if(option?.limitFields){
         for(let item of option.limitFields){
-          delete data[i][item]
+          delete processedData[i][item];
         }
       } 
-        for(let dataItem of Object.keys(data[i])){
-            if(typeof data[i][dataItem] === 'object'){
+        for(let dataItem of Object.keys(processedData[i])){
+            if(processedData[i][dataItem] !== null &&typeof processedData[i][dataItem] === 'object'){
 
-              data[i][dataItem] = convertArrayToString(dataItem,data[i][dataItem],data[i],i)
+              processedData[i][dataItem] = convertArrayToString(dataItem,processedData[i][dataItem],processedData[i],i)
             }
-            if(data[i][dataItem] === undefined){
-              delete data[i][dataItem]
+            if(processedData[i][dataItem] === undefined){
+              delete processedData[i][dataItem]
             }
         }
         
 
     }
   
-    const worksheet = utils.json_to_sheet(data);
+    const worksheet = utils.json_to_sheet(processedData);
     console.log(worksheet)
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, "Sheet1");
     writeFile(workbook, `${fileName}.xlsx`);
   }
-  const importExcelFile =(e,callback?:(data:any)=>void)=>{
+  const importExcelFile =(e:any,callback?:(data:any)=>void)=>{
     e.preventDefault();
     if (e.target.files) {
       let jsonFile ={}
@@ -246,14 +254,15 @@ const useExport =()=>{
         const reader = new FileReader();
         reader.readAsArrayBuffer(e.target.files[0]);
         reader.onload = (e) => {
-            const data = e.target.result;
+          //@ts-ignore
+            const data:any = e.target.result;
             const workbook = readFile(data, { type: "array" });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             const json = utils.sheet_to_json(worksheet);
             let refactoringData:{[key:string]:any} =[];
             const fieldsToRefactor:string[] = []
-
+//@ts-ignore
             for(let originalKey of Object.keys(json[0])){
               if(originalKey.indexOf(' => ') !== -1){
                 fieldsToRefactor.push(originalKey)
