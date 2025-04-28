@@ -21,7 +21,8 @@
 - [x] useTable
 - [x] usePrint
 - [x] useScroll
-
+- [x] usePagination
+  
 ---
 
 ## in progress
@@ -31,6 +32,8 @@ x
 ---
 
 ## Need documentation
+
+-[ ] useBlocker
 
 ---
 
@@ -50,11 +53,6 @@ x
 
 ## start building
 
-x
-
-## in Feature
-
-- [ ] usePagination
 - [ ] useAuth
 - [ ] useToast
 - [ ] useFetch
@@ -64,6 +62,9 @@ x
 - [ ] useToggle
 - [ ] useEventListener
 - [ ] useOnScreen
+
+## in Feature
+
 - [ ] useForceUpdate
 - [ ] useUndoRedo
 - [ ] useThrottle

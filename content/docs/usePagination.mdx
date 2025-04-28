@@ -1,0 +1,140 @@
+---
+title: usePagination
+description: Custom React Hook for managing pagination logic with customizable page size and controls.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import React from 'react';
+import PaginationExample from '@/examples/PaginationExample';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+## Features
+- **Manage Current Page**: Easily control the current page.
+- **Manage Page Size**: Dynamically adjust the number of items per page.
+- **Navigation Utilities**: Move to next/previous page easily.
+- **Simple Integration**: Integrate quickly into any React component.
+
+---
+
+## Exported Functions and Values
+The hook exports the following:
+
+- `currentPage`
+- `totalPages`
+- `pageSize`
+- `setPage`
+- `nextPage`
+- `prevPage`
+- `setCurrentPageSize`
+
+---
+
+## Example Usage
+
+<Tabs items={['code', 'view']}>
+  <Tab value="code">
+
+```tsx
+"use client";
+
+import { usePagination } from "@/hooks/usePagination";
+
+const PaginationExample = () => {
+  const {
+    currentPage,
+    totalPages,
+    nextPage,
+    prevPage,
+    setPage,
+    setCurrentPageSize,
+  } = usePagination({
+    totalItems: 100,
+    pageSize: 10,
+    initialPage: 1,
+  });
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <button onClick={prevPage} disabled={currentPage === 1}>Prev</button>
+        <span>Page {currentPage} of {totalPages}</span>
+        <button onClick={nextPage} disabled={currentPage === totalPages}>Next</button>
+      </div>
+      <div>
+        <label>Change Page Size:</label>
+        <select
+          value={10}
+          onChange={(e) => setCurrentPageSize(Number(e.target.value))}
+          className="p-2 rounded"
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+        </select>
+      </div>
+    </div>
+  );
+};
+
+export default PaginationExample;
+```
+</Tab>
+  <Tab value="view">
+
+    <PaginationExample />
+  </Tab>
+  </Tabs>
+
+## Hook Full code
+```tsx
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
+
+interface UsePaginationOptions {
+  totalItems: number;
+  pageSize?: number;
+  initialPage?: number;
+   
+}
+
+interface UsePaginationResult {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  setPage: (page: number) => void;
+  nextPage: () => void;
+  prevPage: () => void;
+  setCurrentPageSize: Dispatch<SetStateAction<number>>
+}
+
+export function usePagination({
+  totalItems,
+  pageSize = 10,
+  initialPage = 1,
+
+}: UsePaginationOptions): UsePaginationResult {
+  const [currentPage, setCurrentPage] = useState(initialPage);
+const [currentPageSize, setCurrentPageSize] = useState(pageSize);   
+  const totalPages = Math.ceil(totalItems / currentPageSize);
+
+  const setPage = (page: number) => {
+    const newPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(newPage);
+  };
+
+  const nextPage = () => setPage(currentPage + 1);
+  const prevPage = () => setPage(currentPage - 1);
+
+ 
+
+  return {
+    currentPage,
+    totalPages,
+    pageSize:currentPageSize,
+    setPage,
+    nextPage,
+    prevPage,
+    setCurrentPageSize,
+  };
+}
+```
