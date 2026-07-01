@@ -1,4 +1,5 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+import Navbar from './_component/Navbar';
 
 /**
  * Shared layout configurations
@@ -11,6 +12,9 @@ export const baseOptions: BaseLayoutProps = {
   nav: {
     // can be JSX too!
     title: 'My App',
+    enableSearch: true,
+    enabled:false,
+    
   },
   links: [
     {
