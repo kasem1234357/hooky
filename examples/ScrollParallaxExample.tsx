@@ -140,9 +140,7 @@ export default function ParallaxExample() {
           <p className="text-lg text-gray-600 max-w-2xl mb-8">
             The ultimate custom hook for highly performant, spring-physics and easing-based scroll animations in React. Scroll down to see it in action, or interact with the playground containers below!
           </p>
-          <div className="flex items-center space-x-4">
-             <span className="px-3 py-1 bg-blue-100 text-blue-700 font-mono text-sm rounded-md font-semibold">npm i your-package-name</span>
-          </div>
+         
         </div>
       </div>
 
