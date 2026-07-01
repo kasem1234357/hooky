@@ -12,7 +12,7 @@
     "fumadocs-core": "14.7.3",
     "fumadocs-mdx": "11.3.0",
     "fumadocs-ui": "14.7.3",
-    "next": "15.1.4",
+    "next": "15.1.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "xlsx": "^0.18.5"
