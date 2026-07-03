@@ -1,4 +1,4 @@
-//@ts-nocheck
+
 "use client"
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
@@ -15,10 +15,10 @@ import Link from 'next/link';
 
 // --- THE HOOK WE ARE SHOWCASING --- //
 // A real physics-based 3D tilt hook that makes elements react to mouse movement
-function use3DTilt(ref:any, options = { max: 15, perspective: 1000, scale: 1.05 }) {
+function use3DTilt(ref: React.RefObject<HTMLElement>, options = { max: 15, perspective: 1000, scale: 1.05 }) {
   const [style, setStyle] = useState({});
 
-  const onMouseMove = useCallback((e:any) => {
+  const onMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!ref.current) return;
     const { left, top, width, height } = ref.current.getBoundingClientRect();
     const x = (e.clientX - left) / width;
@@ -43,9 +43,11 @@ function use3DTilt(ref:any, options = { max: 15, perspective: 1000, scale: 1.05 
   useEffect(() => {
     const element = ref.current;
     if (element) {
+      // @ts-expect-error: We know this returns null during initial render, but we handle it later.
       element.addEventListener('mousemove', onMouseMove);
       element.addEventListener('mouseleave', onMouseLeave);
       return () => {
+        // @ts-expect-error: We know this returns null during initial render, but we handle it later.
         element.removeEventListener('mousemove', onMouseMove);
         element.removeEventListener('mouseleave', onMouseLeave);
       };
@@ -208,7 +210,7 @@ export default function HomePage() {
       <section className="relative z-10 max-w-7xl mx-auto px-6 py-24">
         <div className="mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Unfair advantages, <br/>built right in.</h2>
-          <p className="text-slate-400 text-lg max-w-xl">We handled the edge cases, memory leaks, and performance optimization so you don't have to.</p>
+          <p className="text-slate-400 text-lg max-w-xl">We handled the edge cases, memory leaks, and performance optimization so you don&apos;t have to.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px]">

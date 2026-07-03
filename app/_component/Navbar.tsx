@@ -1,4 +1,4 @@
-//@ts-nocheck
+
 import { 
   Package, 
   
@@ -13,7 +13,7 @@ function GithubIcon() {
     </svg>
   );
 }
-function Navbar({}: any) {
+function Navbar() {
     
   return (
     <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 glass-panel rounded-full px-6 py-3 flex items-center justify-between w-[90%] max-w-3xl transition-all duration-300 hover:bg-white/[0.05]">
