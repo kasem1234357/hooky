@@ -4,7 +4,7 @@ import {
   
 } from 'lucide-react';
 import Link from 'next/link';
-type Props = {}
+
 function GithubIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -13,7 +13,7 @@ function GithubIcon() {
     </svg>
   );
 }
-function Navbar({}: Props) {
+function Navbar({}: any) {
     
   return (
     <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 glass-panel rounded-full px-6 py-3 flex items-center justify-between w-[90%] max-w-3xl transition-all duration-300 hover:bg-white/[0.05]">
