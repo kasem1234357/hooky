@@ -1,5 +1,5 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import Navbar from './_component/Navbar';
+
 
 /**
  * Shared layout configurations
