@@ -1,0 +1,88 @@
+---
+title: useIntersectionObserver
+description: Custom React hook to observe visibility and intersection changes of multiple DOM elements using the native Intersection Observer API.
+---
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+
+# useIntersectionObserver
+
+A custom React hook designed to track the visibility and intersection changes of multiple DOM elements simultaneously using the native `IntersectionObserver` API. It abstracts away observer setup, lifecycle cleanups, and offers high optimization via a stable mutable ref approach for its callback metrics.
+
+## Features
+
+* **Multi-Element Tracking**: Observe an array of HTML elements efficiently under a single `IntersectionObserver` instance.
+* **Stable Callbacks Cache**: Leverages a `useRef` cache pattern so changing dynamic inline callbacks won't cause the underlying observer to tear down and recreate.
+* **Granular Lifecycle Hooks**: Distinct lifecycle hooks for entering visibility (`onIntersect`), exiting visibility (`onNoIntersect`), beginning observation (`onObserved`), and cleaning up (`onUnobserved`).
+* **Native Configuration Mapping**: Full pass-through configurations for native properties: `root`, `rootMargin`, and `visibilityThreshold`.
+
+---
+
+## Configuration Options (`OPTIONS`)
+
+<TypeTable
+  type={{
+    observationElements: {
+      type: "HTMLElement[]",
+      description: "Array of DOM elements to monitor for intersection updates.",
+      default: "[]",
+    },
+    onIntersect: {
+      type: "(entries: IntersectionObserverEntry[], observer: IntersectionObserver) => void",
+      description: "Callback fired when an observed element enters the visibility threshold range.",
+      default: "undefined",
+    },
+    onNoIntersect: {
+      type: "(entries: IntersectionObserverEntry[], observer: IntersectionObserver) => void",
+      description: "Callback fired when an observed element leaves the visibility threshold range.",
+      default: "undefined",
+    },
+    onObserved: {
+      type: "(element: HTMLElement) => void",
+      description: "Lifecycle hook executed immediately when an element begins observation.",
+      default: "undefined",
+    },
+    onUnobserved: {
+      type: "(element: HTMLElement) => void",
+      description: "Lifecycle hook executed immediately when an element is unobserved or disconnected.",
+      default: "undefined",
+    },
+    visibilityThreshold: {
+      type: "number | number[]",
+      description: "A single number or an array of numbers indicating what percentage of target visibility should trigger the callbacks.",
+      default: "0",
+    },
+    rootMargin: {
+      type: "string",
+      description: "Margin around the root element. Serves to grow or shrink the bounding box of the root.",
+      default: "'0px'",
+    },
+    root: {
+      type: "Element | null",
+      description: "The container element acting as the viewport boundary for testing intersections.",
+      default: "null",
+    },
+  }}
+/>
+
+---
+
+## Exported Values
+
+The hook executes entirely via side-effect configurations and callbacks; it returns `void`.
+
+---
+
+## Example Usage
+<Tabs items={[ 'view']}>
+  <Tab value="view">
+ <iframe src="https://codesandbox.io/p/devbox/r5lwvz?embed=1&file=%2Fsrc%2FIntersectionObserverExample.tsx"
+     style={{width:"100%",height: "500px", border:0, borderRadius: "4px", overflow:"hidden"}}
+     title="IntersectionObserverExample"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+     sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   ></iframe>
+   </Tab>
+</Tabs>
